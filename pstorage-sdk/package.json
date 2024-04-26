@@ -31,6 +31,7 @@
     "@types/chai": "^4.3.14",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.12.7",
+    "axios": "^1.6.8",
     "chai": "^5.1.0",
     "esbuild-plugin-wasm": "^1.1.0",
     "mocha": "^10.4.0",

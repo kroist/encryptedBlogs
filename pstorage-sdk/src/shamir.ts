@@ -9,7 +9,7 @@ export async function shamirShare(input: string, nShares: number): Promise<strin
   return shares.map(toString);
 }
 
-export async function shamirCombine(shares: string[]): Promise<String> {
+export async function shamirCombine(shares: string[]): Promise<string> {
   const reconstructed = await combine(shares.map(toUint8Array));
   return toString(reconstructed);
 }
