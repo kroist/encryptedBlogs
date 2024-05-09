@@ -1,5 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { shamirCombine, shamirShare } from './shamir';
+import { webcrypto } from "crypto";
+import { decryptWithKey, encryptWithKey, genKey } from './crypto';
 
 export class Pnode {
   private client: AxiosInstance;
@@ -21,15 +23,12 @@ export class Pnode {
     let response = await this.client.get('/retrieve', {params: {cid}});
     return response.data.data;
   }
-
 }
 
 export class PnodeClient {
   private nodes: Pnode[];
 
-  constructor(
-    nodeURLS: string[],
-  ) {
+  constructor(nodeURLS: string[]) {
     let nodes: Pnode[] = [];
     for (let nodeURL of nodeURLS) {
       nodes.push(new Pnode(nodeURL));
@@ -46,6 +45,16 @@ export class PnodeClient {
     return cids;
   }
 
+  public async storeEncrypted(data: string, pkeys: webcrypto.CryptoKey[]) {
+    let shares = await shamirShare(data, this.nodes.length);
+    let cids = [];
+    for (let i = 0; i < shares.length; i++) {
+      let encr = await encryptWithKey(shares[i], pkeys[i]);
+      cids.push(await this.nodes[i].store(encr));
+    }
+    return cids;
+  }
+
   public async retrieve(cids: string[]): Promise<string> {
     let shares = [];
     for (let i = 0; i < cids.length; i++) {
@@ -54,4 +63,14 @@ export class PnodeClient {
     return await shamirCombine(shares);
   }
 
+  public async retrieveEncrypted(cids: string[], pkeys: webcrypto.CryptoKey[]): Promise<string> {
+    let shares = [];
+    for (let i = 0; i < cids.length; i++) {
+      shares.push(await decryptWithKey(
+        await this.nodes[i].retrieve(cids[i]),
+        pkeys[i],
+      ));
+    }
+    return await shamirCombine(shares);
+  }
 }
