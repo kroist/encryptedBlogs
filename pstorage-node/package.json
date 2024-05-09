@@ -10,7 +10,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "pnpm build && node ./dist/app.js"
+    "start": "pnpm build && node ./dist/app.js",
+    "typechain": "typechain --target=ethers-v6 --out-dir src/types contracts/*.json"
   },
   "keywords": [],
   "author": "Maksym Zub",
@@ -18,7 +19,9 @@
   "dependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^20.12.7",
+    "ethers": "^6.12.1",
     "express": "^4.19.2",
+    "fhevmjs": "^0.4.0",
     "it-all": "^3.0.6",
     "it-map": "^3.1.0",
     "it-pipe": "^3.0.1",
@@ -28,5 +31,9 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "uint8arrays": "^5.0.3"
+  },
+  "devDependencies": {
+    "@typechain/ethers-v6": "^0.5.1",
+    "typechain": "^8.3.2"
   }
 }

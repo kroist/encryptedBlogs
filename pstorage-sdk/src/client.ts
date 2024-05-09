@@ -23,6 +23,11 @@ export class Pnode {
     let response = await this.client.get('/retrieve', {params: {cid}});
     return response.data.data;
   }
+
+  public async getPubKey(): Promise<string> {
+    let response = await this.client.get('/pubkey');
+    return response.data.pubkey;
+  }
 }
 
 export class PnodeClient {
@@ -72,5 +77,14 @@ export class PnodeClient {
       ));
     }
     return await shamirCombine(shares);
+  }
+
+  public async getPubKeys(): Promise<string[]> {
+    let pubkeys: string[] = [];
+    for (let i = 0; i < this.nodes.length; i++) {
+      pubkeys.push(await this.nodes[i].getPubKey());
+    }
+    // let response = await this.client.get('/pubkey');
+    return pubkeys;
   }
 }
