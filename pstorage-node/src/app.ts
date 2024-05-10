@@ -105,7 +105,9 @@ app.post('/store', async (req: Request, res: Response) => {
 
 app.get('/pubkey', async (req: Request, res: Response) => {
   res.send({
-    pubkey: blockchainParams.fhevmInstance.getPublicKey().publicKey
+    pubkey: blockchainParams.fhevmInstance.getPublicKey(
+      ///TODO: add public key as parameter
+    ).publicKey
   });
 });
 
