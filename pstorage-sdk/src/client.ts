@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { shamirCombine, shamirShare } from './shamir';
-import { webcrypto } from "crypto";
+import * as webcrypto from "@peculiar/webcrypto";
 import { decryptWithKey, encryptWithKey, genKey } from './crypto';
 
 export class Pnode {

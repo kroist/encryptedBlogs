@@ -1,5 +1,7 @@
-import { webcrypto } from "crypto";
-const subtle = webcrypto.subtle;
+import { Crypto } from "@peculiar/webcrypto";
+import * as webcrypto from "@peculiar/webcrypto";
+const crypto = new Crypto();
+const subtle = crypto.subtle;
 
 function toUint8Array(str) {
   return new Uint8Array(str.split('').map(c => c.charCodeAt(0)));
