@@ -7,6 +7,10 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@uiw/react-md-editor": "^4.0.4",
+    "axios": "^1.6.8",
+    "buffer": "^6.0.3",
+    "crypto": "^1.0.1",
+    "crypto-browserify": "^3.12.0",
     "ethers": "^6.12.1",
     "fhevmjs": "^0.4.0",
     "pstoragesdk": "link:../pstorage-sdk",
@@ -15,8 +19,10 @@
     "react-router-dom": "^6.23.0",
     "react-scripts": "5.0.1",
     "resolve": "^1.22.8",
+    "shamir-secret-sharing": "^0.0.3",
     "tfhe": "^0.6.1",
     "web-vitals": "^2.1.4",
+    "webcrypto": "^0.1.1",
     "webpack-manifest-plugin": "^5.0.0"
   },
   "scripts": {

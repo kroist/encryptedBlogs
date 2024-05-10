@@ -7,11 +7,17 @@ import { BrowserProvider, parseUnits } from "ethers";
 import { HDNodeWallet } from "ethers/wallet";
 import { FHEBlogFactory__factory } from "../types/factories/FHEBlogFactory__factory.ts";
 import { FHE_BLOG__factory } from "../types/factories/FHE_BLOG__factory.ts";
-import "pstoragesdk";
-import "pstoragesdk/crypto";
+// import "pstoragesdk";
 
 import { TypedContractMethod } from "../types/common";
 // import { createInstance, FhevmInstance, getPublicKeyCallParams } from 'fhevmjs';
+import {PnodeClient} from "../pstorage-sdk/dist/client.js";
+// const thing = await import("pstoragesdk/features/client");
+// const PnodeClient = thing.PnodeClient
+// import sdk_client from "pstoragesdk/features/client"
+// import sdk_crypto from "pstoragesdk/features/crypto"
+
+// const {PnodeClient} = sdk_client;
 
 export let signer;
 export let provider;
@@ -90,7 +96,7 @@ export const sendText = async(text)=>{
     
 
     const new_client = new PnodeClient(relayers);
-
+    return;
     let not_serialized_keys = await Promise.all([genKey(), genKey()]); // p
   
     let keys : ethers.BytesLike[][] = [

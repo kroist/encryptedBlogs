@@ -1,0 +1,52 @@
+{
+  "name": "pstorage-sdk",
+  "version": "1.0.0",
+  "description": "",
+  "files": [
+    "dist",
+    "package.json"
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./features/*": {
+      "require": "./dist/*.js",
+      "import": "./dist/*.js",
+      "types": "./dist/*.d.ts"
+    },
+    "./crypto": {
+      "require": "./dist/crypto.js",
+      "import": "./dist/crypto.js",
+      "types": "./dist/crypto.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsup ./src",
+    "test": "mocha --reporter spec --require ts-node/register 'src/**/*.test.ts'"
+  },
+  "keywords": [],
+  "author": "Maksym Zub",
+  "license": "MIT",
+  "devDependencies": {
+    "tsup": "^8.0.2"
+  },
+  "dependencies": {
+    "@types/chai": "^4.3.14",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.12.7",
+    "axios": "^1.6.8",
+    "chai": "^5.1.0",
+    "esbuild-plugin-wasm": "^1.1.0",
+    "mocha": "^10.4.0",
+    "shamir-secret-sharing": "^0.0.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
