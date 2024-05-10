@@ -11,7 +11,7 @@ import { FHE_BLOG__factory } from "../types/factories/FHE_BLOG__factory.ts";
 
 import { TypedContractMethod } from "../types/common";
 // import { createInstance, FhevmInstance, getPublicKeyCallParams } from 'fhevmjs';
-import {PnodeClient} from "../pstorage-sdk/dist/client.js";
+import {PnodeClient} from "pstoragesdk";
 // const thing = await import("pstoragesdk/features/client");
 // const PnodeClient = thing.PnodeClient
 // import sdk_client from "pstoragesdk/features/client"

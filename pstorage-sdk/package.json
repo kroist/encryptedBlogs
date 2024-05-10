@@ -6,23 +6,6 @@
     "dist",
     "package.json"
   ],
-  "exports": {
-    ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
-    },
-    "./features/*": {
-      "require": "./dist/*.js",
-      "import": "./dist/*.cjs",
-      "types": "./dist/*.d.ts"
-    },
-    "./crypto": {
-      "require": "./dist/crypto.js",
-      "import": "./dist/crypto.cjs",
-      "types": "./dist/crypto.d.ts"
-    }
-  },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
