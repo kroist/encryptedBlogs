@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 
 
-import {Routes, Route} from 'react-router-dom'
+import {Routes, Route, Navigate} from 'react-router-dom'
 import React, {useState} from 'react'
 
 import EditBlogPost from './components/EditBlogPost.tsx';
@@ -20,6 +20,7 @@ const App = () => {
         <Route path="/login" element={<Login url={img}/>} />
         
         <Route path="/mrk" element={<MarkDown />}/>
+        <Route path="/*" element={<Navigate to="/edit" replace />} />
     </Routes>
   
 

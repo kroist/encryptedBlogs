@@ -10,7 +10,7 @@ import { FHE_BLOG__factory } from "../types/factories/FHE_BLOG__factory.ts";
 // import "pstoragesdk";
 
 import { TypedContractMethod } from "../types/common";
-// import { createInstance, FhevmInstance, getPublicKeyCallParams } from 'fhevmjs';
+import { createInstance, FhevmInstance, getPublicKeyCallParams } from 'fhevmjs';
 import {PnodeClient} from "pstoragesdk";
 // const thing = await import("pstoragesdk/features/client");
 // const PnodeClient = thing.PnodeClient
@@ -90,12 +90,13 @@ export const createFhevmInstance = async (contractAddress: string, account: ethe
 
 export const sendText = async(text)=>{
 
-    // const instance = await createFhevmInstance(factoryAddress, signer, provider);
+    const instance = await createFhevmInstance(factoryAddress, signer, provider);
     /// is this good anyway?
 
     
 
     const new_client = new PnodeClient(relayers);
+    alert("good")
     return;
     let not_serialized_keys = await Promise.all([genKey(), genKey()]); // p
   
