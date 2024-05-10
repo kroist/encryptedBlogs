@@ -247,6 +247,31 @@ export const sendText = async(text, instance, metamask_provider)=>{
 
 }
 
+export const generateSignature = async(metamask_provider , blog_address, relayer_id)=>{
+    let provider = normalizeProvider(metamask_provider);
+    let signer = await provider.getSigner();
+    let signer_addr = await signer.getAddress();
+
+    const blog_contract = FHE_BLOG__factory.connect(blog_address, signer);
+    let nonce = blog_contract.latest_nonce(signer_addr);
+
+    let abiencoder = new ethers.AbiCoder();
+    let encoded = abiencoder.encode(["uint256", "uint256"], [relayer_id, nonce]);
+    const hash = ethers.keccak256(encoded);
+    const messageBytes = Buffer.from(hash.slice(2), 'hex');
+    const signature = await signer.signMessage(messageBytes );
+    return signature;
+}
+
+export const requestAccess = async(metamask_provider , blog_address)=>{
+  let signatures = [];
+  for(let i = 0; i < relayers.length; i += 1){
+    signatures.push(await generateSignature(metamask_provider, blog_address, i));
+  }
+
+  const client = new PnodeClient(relayers);
+  client.retrieve_decrypted
+}
 
 
 export const nftPosession = async (metamask_provider, blog_address, nft)=>{
