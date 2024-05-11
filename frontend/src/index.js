@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { MetaMaskUIProvider } from '@metamask/sdk-react-ui'
 import {
   BrowserRouter,
   Routes,
@@ -11,9 +12,24 @@ import {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-  <BrowserRouter>  
-    <App />
+     <MetaMaskUIProvider
+      sdkOptions={{
+        checkInstallationImmediately: true,
+        // preferDesktop: true,
+        dappMetadata: {
+          name: 'Demo UI React App',
+          url: process.env.GAME_URL,
+        },
+        // checkInstallationImmediately: true,
+        // extensionOnly: true,
+      }}
+    >
+    <BrowserRouter>  
+      <App />
     </BrowserRouter>
+
+
+  </MetaMaskUIProvider>
   </React.StrictMode>
  
 );

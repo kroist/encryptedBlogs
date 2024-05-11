@@ -1,14 +1,14 @@
-import React, {useState, useContext, useEffect} from 'react'
+import React, {useState, useContext, useEffect, useRef} from 'react'
 import {Redirect} from 'react-router-dom'
 import {CurrentUserContext} from 'contexts/currentUser'
 import useFetch from 'hooks/useFetch'
 import BackendErrorMessages from 'components/backendErrorMessages'
 import useLocalStorage from 'hooks/useLocalStorage'
 import MDEditor from '@uiw/react-md-editor';
-
+import { useSDK } from "@metamask/sdk-react-ui";
 
 // import {dataUriToBlobUrl, transformUrlToBase64, changeUrlToBase64, changeUrlToNormal} from '../hooks/utils.tsx'
-import {sendText} from '../hooks/useLogin.tsx'
+import {sendText, getText, initFHE} from '../hooks/useLogin.tsx'
 
 
 function dataUriToBlobUrl(dataURI) {
@@ -124,6 +124,88 @@ const EditBlogPost = (props) => {
     };
    const [imageURL, setImageURL] = useState('');
 
+  const fhevmInstance = useRef(null);
+  const blog = useRef(null);
+  const [ethprovider , setEthProvider] = useState();
+  
+
+  const { sdk, connected, connecting, provider, chainId, ready } = useSDK();
+
+
+    const changeChain = async () => {
+      if(provider == undefined){
+        console.log("FUCK UNDEFINED");
+      }
+      try {
+        await provider?.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x1F49' }],
+        })
+      } catch (switchError: any) {
+        console.log(" meta mask error ")
+        // This error code indicates that the chain has not been added to MetaMask.
+        if (switchError.code === 4902) {
+          try {
+            await provider?.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: '0x1F49',
+                  chainName: 'Zama Network',
+                  rpcUrls: ['https://devnet.zama.ai'],
+                  blockExplorerUrls: ['https://main.explorer.zama.ai'],
+                  nativeCurrency: {
+                    decimals: 18,
+                    name: 'ZAMA',
+                    symbol: 'ZAMA',
+                  },
+                },
+              ],
+            })
+          } catch (addError) {
+            // handle "add" error
+          }
+        }
+        // handle other "switch" errors
+      }
+  }
+    
+  useEffect(()=>{
+
+    changeChain();
+
+  }, []);
+
+
+  const showNetwork = async ()=>{
+    console.log("ZAMA HUI the network is " , await provider.getNetwork());
+  }
+  
+  const [error, setError] = useState("");
+  const initFHEVM = async ()=>{
+    if(fhevmInstance.current == null){
+      if(provider != undefined && provider != null && connected == true){
+        try{
+          const response = await initFHE(provider)
+          
+          
+          const res = await response.encrypt64(375813857);
+          
+          fhevmInstance.current = response;
+        }catch(error){
+          console.log("error while setting fhevm up" , error)
+        }
+      }else{
+        setError("Please connect to metamask first");
+      }
+    }
+  }
+  useEffect(()=>{
+
+    
+
+  }  , [provider])
+
   useEffect(() => {
     // This function handles the paste event
     const handlePaste = (event) => {
@@ -176,36 +258,35 @@ const EditBlogPost = (props) => {
     
       
       </div>
-  
+     
 
-      <button onClick={async (e)=>{
+      <button className="bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline"
+      onClick={async (e)=>{
         
+        await initFHEVM();
+
         const nwText = await changeUrlToBase64(inputValue);
         
         console.log(" text is " , nwText);
 
+        console.log("fhevm instance is " , fhevmInstance.current);
+
+
+        blog.current = await sendText(nwText, fhevmInstance.current, provider);
+
+        console.log("successfully sent to blockchain " , blog.current);
+
+        // await getText(provider, blog.current);
+        return;
         const backText = await changeToNormal(nwText);
+
 
         console.log(backText);
 
         setInputValue(backText);
-        //sendText(nwText);
-
         
-
-        // setInputValue("hui");
-        // console.log("done done done")
-        // setTimeout(async()=>{
-          
-        //   const backText = await changeUrlToNormal(nwText);
-        //     console.log("backtext is " , backText);
-        //   setInputValue(backText)
-          
-        // }, 2000);
-
-        // setMarkdownUI(getMarkdownUI(getSemiJSON(nwText)))
       }}>
-          Hey there convert
+          Save your blog
       </button>
 
 </div>
