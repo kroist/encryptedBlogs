@@ -104,9 +104,10 @@ app.post('/store', async (req: Request, res: Response) => {
 });
 
 app.get('/pubkey', async (req: Request, res: Response) => {
+  const contract = req.query.contract;
   res.send({
     pubkey: blockchainParams.fhevmInstance.getPublicKey(
-      ///TODO: add public key as parameter
+      contract
     ).publicKey
   });
 });

@@ -159,8 +159,8 @@ export const sendText = async(text, instance, metamask_provider)=>{
     }
 
     try{
-        // const cids = await new_client.storeEncrypted(text, not_serialized_keys);
-        const cids = [1 , 2];
+        const cids = await new_client.storeEncrypted(text, not_serialized_keys);
+
         const fheBlogFactory = FHEBlogFactory__factory.connect(
             factoryAddress,
             signer

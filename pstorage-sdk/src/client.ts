@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { shamirCombine, shamirShare } from './shamir';
-import * as webcrypto from "@peculiar/webcrypto";
+import { webcrypto } from "crypto";
 import { decryptWithKey, encryptWithKey, genKey } from './crypto';
 
 export class Pnode {
@@ -24,8 +24,8 @@ export class Pnode {
     return response.data.data;
   }
 
-  public async getPubKey(): Promise<string> {
-    let response = await this.client.get('/pubkey');
+  public async getPubKey(contract_addr : string): Promise<string> {
+    let response = await this.client.get(`/pubkey?contract=${contract_addr}`);
     return response.data.pubkey;
   }
 }
@@ -79,10 +79,10 @@ export class PnodeClient {
     return await shamirCombine(shares);
   }
 
-  public async getPubKeys(): Promise<string[]> {
+  public async getPubKeys(contract_addr : string): Promise<string[]> {
     let pubkeys: string[] = [];
     for (let i = 0; i < this.nodes.length; i++) {
-      pubkeys.push(await this.nodes[i].getPubKey());
+      pubkeys.push(await this.nodes[i].getPubKey(contract_addr));
     }
     // let response = await this.client.get('/pubkey');
     return pubkeys;
