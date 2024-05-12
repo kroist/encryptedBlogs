@@ -10,9 +10,7 @@ module.exports = {
         display: ['Satoshi', 'Georgia', 'serif'],
         body: ['Satoshi', 'system-ui', 'sans-serif'],
       },
-      animation: {
-        'spin-slow': 'spin 3s linear infinite',
-      },
+
       colors: {
         primary: {
           50: '#f8fafc',

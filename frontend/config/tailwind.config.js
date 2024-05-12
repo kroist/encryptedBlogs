@@ -6,12 +6,11 @@ module.exports = {
   content: ["./src/**/*.{html,js,tsx,ts,jsx,css,scss,sass,json}", "./public/index.html"],
   theme: {
     extend: {
+     
+
       fontFamily: {
         display: ['Satoshi', 'Georgia', 'serif'],
         body: ['Satoshi', 'system-ui', 'sans-serif'],
-      },
-      animation: {
-        'spin-slow': 'spin 3s linear infinite',
       },
       colors: {
         primary: {

@@ -6,11 +6,11 @@ import BackendErrorMessages from 'components/backendErrorMessages'
 import useLocalStorage from 'hooks/useLocalStorage'
 import MDEditor from '@uiw/react-md-editor';
 import { useSDK } from "@metamask/sdk-react-ui";
-
+import Loading from './Loading.tsx'
 // import {dataUriToBlobUrl, transformUrlToBase64, changeUrlToBase64, changeUrlToNormal} from '../hooks/utils.tsx'
 import {sendText, getText, initFHE, nftPosession, mintNft} from '../hooks/useLogin.tsx'
-
-
+import BlogPreviewInput from './BlogPreviewInput.tsx';
+import {publishPublicPreview} from '../hooks/publicPreview.tsx'
 function dataUriToBlobUrl(dataURI) {
   // Split the base64 string into parts to extract the data and the encoding
   const parts = dataURI.split(';base64,');
@@ -113,8 +113,18 @@ const changeToNormal = async (text)=>{
   }
   return newText;
 }
-
+const prettyDate = (date)=>{
+  const options = {
+    year: 'numeric',
+    month: 'short',  // "short" for abbreviated month name
+    day: '2-digit'   // "2-digit" for two-digit day
+};
+const formattedDate = date.toLocaleDateString('en-US', options);
+return formattedDate;
+}
 const EditBlogPost = (props) => {
+  const [headline, setHeadline] = useState('');
+  const [description, setDescription] = useState('');
 
     const [markdownUI, setMarkdownUI] = useState(null)
     const [inputValue, setInputValue] = useState();
@@ -247,9 +257,25 @@ const EditBlogPost = (props) => {
   }
   const [kek, setKek] = useState()
  
+  const [loading, setLoading] = useState(false);
+  const submitEdit = ()=>{
+    setLoading(true);
+
+    const publicPreview = {
+      headline: headline,
+      description: description,
+      author: 'Daniel',
+      date: prettyDate(new Date())
+    }
+
+    publishPublicPreview(publicPreview).then(response=>{
+      alert("successfully published");
+    }
+    )
+  }
 
 
-    return (<div style={{width: '100%', display: 'flex', flexDirection: 'column',alignItems: 'center', height: '100vh'}}>
+    return (<div style={{width: '100%', height: '100vh', display: 'flex', flexDirection: 'column',alignItems: 'center', height: '100vh'}}>
 
      
      
@@ -262,8 +288,10 @@ const EditBlogPost = (props) => {
         />
     
       
-      </div>
+      
      
+      <BlogPreviewInput headline={headline} setHeadline={setHeadline} description={description} setDescription={setDescription}/>
+
 
       <button className="bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline"
       onClick={async (e)=>{
@@ -294,12 +322,22 @@ const EditBlogPost = (props) => {
           Save your blog
       </button>
 
-      <button onClick={(e)=>{
+      <button className="bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline" onClick={(e)=>{
         testNftMint();
       }}>
         Test Nft mint
       </button>
 
+
+      <button className="bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline" onClick={(e)=>{
+        submitEdit();
+      }}>
+        Test publish public
+      </button>
+
+
+        <Loading loading={loading} />
+      </div>
 </div>
     );
    

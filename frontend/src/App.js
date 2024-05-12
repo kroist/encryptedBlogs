@@ -9,19 +9,28 @@ import EditBlogPost from './components/EditBlogPost.tsx';
 import MarkDown from './components/MarkDown.tsx';
 
 import Login from './components/Login.tsx';
-
+import Feed from './components/Feed.tsx'
+import NavBar from './components/NavBar.tsx';
+import useFetchBlogs from './hooks/useFetchBlogs.tsx';
 const App = () => {
   const [img, setImg] = useState('')
+  const [blogs, error, fetchBlogs, loading] = useFetchBlogs();
+
+
   return (
-    
+    <>
+    <NavBar />
        <Routes>
         
         <Route path="/edit" element={<EditBlogPost url={img}/>} />
         <Route path="/login" element={<Login url={img}/>} />
         
         <Route path="/mrk" element={<MarkDown />}/>
+        <Route path="/feed" element={<Feed blogs={blogs} error={error} loading={loading}/>} />
         <Route path="/*" element={<Navigate to="/edit" replace />} />
     </Routes>
+    </>
+
   
 
 )
