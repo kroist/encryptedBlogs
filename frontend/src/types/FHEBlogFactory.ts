@@ -24,23 +24,23 @@ import type {
 
 export type BlogStorageStruct = {
   cid: BytesLike[];
-  p: BytesLike[][];
+  p: [BytesLike, BytesLike][];
   publicKey: BytesLike[];
 };
 
 export type BlogStorageStructOutput = [
   cid: string[],
-  p: string[][],
+  p: [string, string][],
   publicKey: string[]
-] & { cid: string[]; p: string[][]; publicKey: string[] };
+] & { cid: string[]; p: [string, string][]; publicKey: string[] };
 
 export interface FHEBlogFactoryInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "blogs"
       | "blogsCount"
-      | "createBlog((bytes[],bytes[][],bytes32[]),bytes32)"
-      | "createBlog((bytes[],bytes[][],bytes32[]),string,string,bytes32)"
+      | "createBlog((bytes[],bytes[2][],bytes32[]),bytes32)"
+      | "createBlog((bytes[],bytes[2][],bytes32[]),string,string,bytes32)"
       | "creator"
       | "eip712Domain"
       | "getBlogAddress"
@@ -54,11 +54,11 @@ export interface FHEBlogFactoryInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "createBlog((bytes[],bytes[][],bytes32[]),bytes32)",
+    functionFragment: "createBlog((bytes[],bytes[2][],bytes32[]),bytes32)",
     values: [BlogStorageStruct, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "createBlog((bytes[],bytes[][],bytes32[]),string,string,bytes32)",
+    functionFragment: "createBlog((bytes[],bytes[2][],bytes32[]),string,string,bytes32)",
     values: [BlogStorageStruct, string, string, BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "creator", values?: undefined): string;
@@ -74,11 +74,11 @@ export interface FHEBlogFactoryInterface extends Interface {
   decodeFunctionResult(functionFragment: "blogs", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "blogsCount", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "createBlog((bytes[],bytes[][],bytes32[]),bytes32)",
+    functionFragment: "createBlog((bytes[],bytes[2][],bytes32[]),bytes32)",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "createBlog((bytes[],bytes[][],bytes32[]),string,string,bytes32)",
+    functionFragment: "createBlog((bytes[],bytes[2][],bytes32[]),string,string,bytes32)",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "creator", data: BytesLike): Result;
@@ -149,13 +149,13 @@ export interface FHEBlogFactory extends BaseContract {
 
   blogsCount: TypedContractMethod<[], [bigint], "view">;
 
-  "createBlog((bytes[],bytes[][],bytes32[]),bytes32)": TypedContractMethod<
+  "createBlog((bytes[],bytes[2][],bytes32[]),bytes32)": TypedContractMethod<
     [_data: BlogStorageStruct, salt: BytesLike],
     [void],
     "nonpayable"
   >;
 
-  "createBlog((bytes[],bytes[][],bytes32[]),string,string,bytes32)": TypedContractMethod<
+  "createBlog((bytes[],bytes[2][],bytes32[]),string,string,bytes32)": TypedContractMethod<
     [
       _data: BlogStorageStruct,
       _nft_name: string,
@@ -197,14 +197,14 @@ export interface FHEBlogFactory extends BaseContract {
     nameOrSignature: "blogsCount"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "createBlog((bytes[],bytes[][],bytes32[]),bytes32)"
+    nameOrSignature: "createBlog((bytes[],bytes[2][],bytes32[]),bytes32)"
   ): TypedContractMethod<
     [_data: BlogStorageStruct, salt: BytesLike],
     [void],
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "createBlog((bytes[],bytes[][],bytes32[]),string,string,bytes32)"
+    nameOrSignature: "createBlog((bytes[],bytes[2][],bytes32[]),string,string,bytes32)"
   ): TypedContractMethod<
     [
       _data: BlogStorageStruct,

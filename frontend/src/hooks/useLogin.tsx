@@ -81,7 +81,7 @@ export const initFHE = async (metamaskProvider: SDKProvider) => {
 
 const relayers = ["http://localhost:3002", "http://localhost:3003"]
 
-const factoryAddress = '0xA7aE0EC3aAD2e43a1a489a83d8b3A3015f648a26';
+const factoryAddress = '0x2d31186A1Cae2Bf56dfC3076ef6B90a39bF6bdd9';
 // const factoryAddress = '0x4Fa39D4AfaB4d1ed2179Fe9637EEF5aAE2598D93';
 const generatePublicKey = async (contractAddress: string, signer: ethers.Signer, instance: FhevmInstance) => {
     // Generate token to decrypt
@@ -163,7 +163,7 @@ export const sendText = async(text, instance, metamask_provider)=>{
 
     let cnt_relayers = relayers.length;
 
-    let keys: ethers.BytesLike[][] = []; 
+    let keys: [ethers.BytesLike, ethers.BytesLike][] = [];
     for(let i = 0; i < cnt_relayers; i += 1){
         let serialized_key = await serializeKey(not_serialized_keys[i]);
         keys.push([
@@ -206,17 +206,34 @@ export const sendText = async(text, instance, metamask_provider)=>{
         }
 
         console.log("PUB KEYS ARE" , " ", pubkeys);
-        const txDeploy = await createTransaction(
-            fheBlogFactory["createBlog((bytes[],bytes[][],bytes32[]),string,string,bytes32)"],
-            {
-                cid: bytes32_cids,
-                p: keys,
-                publicKey: transformed_keys
-            },  
-            'FHE_BLOG',
-            'FHBL',
-            randomSalt
-          );
+        
+        // const txDeploy = await createTransaction(
+        //     fheBlogFactory["createBlog((bytes[],bytes[][],bytes32[]),string,string,bytes32)"],
+        //     {
+        //         cid: bytes32_cids,
+        //         p: keys,
+        //         publicKey: transformed_keys
+        //     },  
+        //     'FHE_BLOG',
+        //     'FHBL',
+        //     randomSalt
+        //   );
+
+        console.log(keys);
+
+        const txDeploy = await fheBlogFactory["createBlog((bytes[],bytes[2][],bytes32[]),string,string,bytes32)"](
+          {
+              cid: bytes32_cids,
+              p: keys,
+              publicKey: transformed_keys
+          },  
+          'FHE_BLOG',
+          'FHBL',
+          randomSalt,
+          {
+            gasLimit: 10000000
+          }
+        );
         await txDeploy.wait();
         
         console.log("deployed");
@@ -272,7 +289,7 @@ export const createTransaction = async <A extends [...{ [I in keyof A]-?: A[I] |
     // console.log("GAS LIMIT IS " , gasLimit);
     const updatedParams: ContractMethodArgs<A> = [
       ...params,
-      { gasLimit: 100000000 },
+      { gasLimit: 10000000 },
     ];
     return method(...updatedParams);
 };
