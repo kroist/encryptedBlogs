@@ -6,11 +6,16 @@ export const getCurrentPublicView = async()=>{
         const info = (await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`))?.data;
         
         const bin = info.record;
+
         return bin.blogPreviews
     }catch(error){
         console.log("error while fetching blogs " , error);
         throw error;
     }
+}
+export const getBlogPreview = async (addr)=>{
+    const getBlogs = await getCurrentPublicView();
+    return getBlogs.find((blog)=> blog.address == addr);
 }
 export const publishPublicPreview = async (blog)=>{
 

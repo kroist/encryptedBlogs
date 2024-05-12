@@ -1,0 +1,3 @@
+[submodule "zama"]
+	path = zama
+	url = https://github.com/redhood31/zama.git

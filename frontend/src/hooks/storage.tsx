@@ -31,7 +31,7 @@ export const addNft = (contract , nft)=>{
     let nfts = getNfts();
     nfts.push({
         contract : contract,
-        nft: nft
+        nft: Number(nft)
     });
     localStorage.setItem("nft_possesion" , JSON.stringify(nfts));
 }

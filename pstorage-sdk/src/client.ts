@@ -25,7 +25,29 @@ export class Pnode {
     let response = await this.client.get('/retrieve', {params: {cid}});
     return response.data.data;
   }
-
+  /*
+ const {cid, key} = await getKeyAndCidFromBlockchain(
+    blockchainParams,
+    data.blog_id,
+    data.nft_id,
+    data.relayer_id,
+    data.caller,
+    data.nonce,
+    data.signature
+  );
+  */
+  public async retrieve_decrypted(blog_id: string, nft_id : string, relayer_id : string,  caller, nonce, signature): Promise<string> {
+    let response = await this.client.post('/retrieve_decrypt', {
+      blod_id : blog_id,
+      nft_id : nft_id,
+      relayer_id : relayer_id,
+      caller : caller,
+      nonce : nonce,
+      signature : signature
+    });
+    return response.data.data;
+  }
+  
   public async getPubKey(contract_addr : string): Promise<Uint8Array> {
     let response = await this.client.get(`/pubkey?contract=${contract_addr}`);
     console.log(" RESPONSE IS " , response.data.pubkey);

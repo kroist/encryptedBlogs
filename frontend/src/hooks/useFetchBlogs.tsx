@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react'
-import axios from 'axios'
-import {BIN_ID}  from './publicPreview.tsx'
+import axios, { all } from 'axios'
+import {BIN_ID, getCurrentPublicView}  from './publicPreview.tsx'
 
-const useFetchBlogs = () => {
+const useFetchBlogs = (filter = null) => {
     const [blogs, setBlogs] = useState([]);
     const [error, setError] = useState("");
     const [loading , setLoading] = useState(false);
@@ -10,14 +10,19 @@ const useFetchBlogs = () => {
         setError("");
         setLoading(true);
         try{
-            const info = (await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`))?.data;
-            
-            const bin = info.record;
-            setBlogs(bin.blogPreviews);
+
+            const all_blogs = await getCurrentPublicView();
+            console.log("all blogs are " , all_blogs);
+            if(filter && filter != null){
+                setBlogs(filter(all_blogs));
+            }else{
+                setBlogs(all_blogs);
+            }
         }catch(error){
             console.log("error while fetching blogs " , error);
             setError(error);
         }
+        
         setLoading(false);
     }
     useEffect(()=>{

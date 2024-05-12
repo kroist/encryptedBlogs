@@ -14,6 +14,7 @@ import { createInstance, FhevmInstance, getPublicKeyCallParams, initFhevm} from 
 import {PnodeClient} from "pstoragesdk";
 import {genKey, serializeKey} from "pstoragesdk";
 import bs58 from 'bs58';
+const { BigNumber } = require('ethers');
 // const thing = await import("pstoragesdk/features/client");
 // const PnodeClient = thing.PnodeClient
 // import sdk_client from "pstoragesdk/features/client"
@@ -255,6 +256,7 @@ export const nftPosession = async (metamask_provider, blog_address, nft)=>{
         blog_address,
         signer
     );
+
     const owner = await fheBlog.ownerOf(nft)
     const is_owner = owner == (await signer.getAddress());
 
