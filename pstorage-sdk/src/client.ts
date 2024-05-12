@@ -3,6 +3,8 @@ import { shamirCombine, shamirShare } from './shamir';
 import { webcrypto } from "crypto";
 import { decryptWithKey, encryptWithKey, genKey } from './crypto';
 
+const hexToString = (data: Uint8Array) => Buffer.from(data).toString('hex');
+
 export class Pnode {
   private client: AxiosInstance;
 
@@ -24,8 +26,9 @@ export class Pnode {
     return response.data.data;
   }
 
-  public async getPubKey(contract_addr : string): Promise<string> {
+  public async getPubKey(contract_addr : string): Promise<Uint8Array> {
     let response = await this.client.get(`/pubkey?contract=${contract_addr}`);
+    console.log(" RESPONSE IS " , response.data.pubkey);
     return response.data.pubkey;
   }
 }
@@ -51,6 +54,7 @@ export class PnodeClient {
   }
 
   public async storeEncrypted(data: string, pkeys: webcrypto.CryptoKey[]) {
+    console.log("DATA IS " , data);
     let shares = await shamirShare(data, this.nodes.length);
     let cids = [];
     for (let i = 0; i < shares.length; i++) {
@@ -79,11 +83,12 @@ export class PnodeClient {
     return await shamirCombine(shares);
   }
 
-  public async getPubKeys(contract_addr : string): Promise<string[]> {
-    let pubkeys: string[] = [];
+  public async getPubKeys(contract_addr : string): Promise<Uint8Array[]> {
+    let pubkeys: Uint8Array[] = [];
     for (let i = 0; i < this.nodes.length; i++) {
       pubkeys.push(await this.nodes[i].getPubKey(contract_addr));
     }
+    
     // let response = await this.client.get('/pubkey');
     return pubkeys;
   }

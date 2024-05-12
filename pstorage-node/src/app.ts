@@ -6,7 +6,8 @@ import { extract } from 'it-tar'
 import map from 'it-map'
 import all from 'it-all';
 import { decryptWithKey, parseKey } from './crypto.js';
-import { getKeyAndCidFromBlockchain, initBlockchain } from './blockchain.js';
+import { getKeyAndCidFromBlockchain, initBlockchain, generatePublicKey } from './blockchain.js';
+import cors from 'cors'
 
 let cid = CID.parse('QmSnuWmxptJZdLJpKRarxBMS2Ju2oANVrgbr2xWbie9b2D');
 console.log(cid);
@@ -32,9 +33,13 @@ console.log('read');
 const blockchainParams = await initBlockchain(process.argv[3]);
 // await readBlockchain(blockchainParams);
 
-
 app.use(express.json({limit: '50mb'}));
-
+app.use(
+  cors({
+    origin: ['http://localhost:3000'],
+    credentials: true // Allow any origin and specifically allow http://localhost:3000
+  })
+);
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World with TypeScript!');
 });
@@ -104,11 +109,16 @@ app.post('/store', async (req: Request, res: Response) => {
 });
 
 app.get('/pubkey', async (req: Request, res: Response) => {
-  const contract = req.query.contract;
+  let contract : string = String(req.query.contract);
+
+  await generatePublicKey(contract, blockchainParams.signer, blockchainParams.fhevmInstance);
+  // console.log(" contract is " , contract);
+  // console.log(" instance " ,blockchainParams.fhevmInstance);
+  console.log(" pub key " , blockchainParams.fhevmInstance.getPublicKey(contract).publicKey)
   res.send({
-    pubkey: blockchainParams.fhevmInstance.getPublicKey(
+    pubkey: Array.from(blockchainParams.fhevmInstance.getPublicKey(
       contract
-    ).publicKey
+    ).publicKey)
   });
 });
 

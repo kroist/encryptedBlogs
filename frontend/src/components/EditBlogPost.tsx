@@ -8,7 +8,7 @@ import MDEditor from '@uiw/react-md-editor';
 import { useSDK } from "@metamask/sdk-react-ui";
 
 // import {dataUriToBlobUrl, transformUrlToBase64, changeUrlToBase64, changeUrlToNormal} from '../hooks/utils.tsx'
-import {sendText, getText, initFHE} from '../hooks/useLogin.tsx'
+import {sendText, getText, initFHE, nftPosession, mintNft} from '../hooks/useLogin.tsx'
 
 
 function dataUriToBlobUrl(dataURI) {
@@ -239,7 +239,12 @@ const EditBlogPost = (props) => {
     };
   }, []);
 
-
+  const testNftMint = async ()=>{
+      const some = '0x06FEa2766f97B52879b73fcC8E7537f51DDbEE30';
+      const nft_token = await mintNft(provider, some);
+      alert("Issued token is " + nft_token);
+      alert("True if you're owner of it" + await nftPosession(provider, some, nft_token));
+  }
   const [kek, setKek] = useState()
  
 
@@ -275,8 +280,8 @@ const EditBlogPost = (props) => {
         blog.current = await sendText(nwText, fhevmInstance.current, provider);
 
         console.log("successfully sent to blockchain " , blog.current);
-
-        // await getText(provider, blog.current);
+        
+        
         return;
         const backText = await changeToNormal(nwText);
 
@@ -287,6 +292,12 @@ const EditBlogPost = (props) => {
         
       }}>
           Save your blog
+      </button>
+
+      <button onClick={(e)=>{
+        testNftMint();
+      }}>
+        Test Nft mint
       </button>
 
 </div>

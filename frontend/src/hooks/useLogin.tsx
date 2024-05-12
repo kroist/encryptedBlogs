@@ -13,6 +13,7 @@ import { TypedContractMethod } from "../types/common";
 import { createInstance, FhevmInstance, getPublicKeyCallParams, initFhevm} from 'fhevmjs';
 import {PnodeClient} from "pstoragesdk";
 import {genKey, serializeKey} from "pstoragesdk";
+import bs58 from 'bs58';
 // const thing = await import("pstoragesdk/features/client");
 // const PnodeClient = thing.PnodeClient
 // import sdk_client from "pstoragesdk/features/client"
@@ -21,7 +22,13 @@ import {genKey, serializeKey} from "pstoragesdk";
 // const {PnodeClient} = sdk_client;
 
 
-
+const decodeIpfsHash = (input)=>{
+    const bytes = bs58.decode(input);
+      // Convert the Uint8Array to a string to display it
+      // Using Buffer to convert Uint8Array to a readable string (optional)
+    const result = Buffer.from(bytes).toString('hex');
+    return result;
+}
 
 const addChaing = async()=>{
 
@@ -72,10 +79,10 @@ export const initFHE = async (metamaskProvider: SDKProvider) => {
 
 
 
-const relayers = ["http://localhost:3001", "http://localhost:3002"]
+const relayers = ["http://localhost:3002", "http://localhost:3003"]
 
-const factoryAddress = '0xB125C346f66166B3b5DbC3EDDe89dDa9f486bc85';
-
+const factoryAddress = '0xA7aE0EC3aAD2e43a1a489a83d8b3A3015f648a26';
+// const factoryAddress = '0x4Fa39D4AfaB4d1ed2179Fe9637EEF5aAE2598D93';
 const generatePublicKey = async (contractAddress: string, signer: ethers.Signer, instance: FhevmInstance) => {
     // Generate token to decrypt
     const generatedToken = instance.generatePublicKey({
@@ -117,8 +124,23 @@ export const createFhevmInstance = async (contractAddress: string, account: ethe
 };
 
 
+const stringToHex = (str) => {
+    return str.split('').map((char) => {
+      return char.charCodeAt(0).toString(16).padStart(2, '0');
+    }).join('');
+  };
 
 
+const addZero = (input) : any => {
+    if (Array.isArray(input)) {
+      // If the input is an array, map through it and prefix each element
+      return input.map(str => '0x' + str);
+    } else {
+      // If it's a single string, just add '0x' to the front
+      return '0x' + input;
+    }
+  }
+  
 export const sendText = async(text, instance, metamask_provider)=>{
     
 
@@ -157,31 +179,39 @@ export const sendText = async(text, instance, metamask_provider)=>{
     for (let i = 0; i < 32; i++) {
         randomSalt[i] = Math.floor(Math.random() * 256);
     }
-
     try{
-        const cids = await new_client.storeEncrypted(text, not_serialized_keys);
+        const cids : any[] = await new_client.storeEncrypted(stringToHex(text), not_serialized_keys);
 
         const fheBlogFactory = FHEBlogFactory__factory.connect(
             factoryAddress,
             signer
         );
-        const val = await fheBlogFactory.blogsCount();
-        alert("VAL IS " + val);
-
-        return;
+      
         const predict_addr = await fheBlogFactory.getBlogAddress(randomSalt);
 
-        console.log( " PREDICT " , predict_addr);
+
+        let bytes32_cids : string[] = [];
+        for(let cid of cids){
+            bytes32_cids.push(
+                addZero(decodeIpfsHash(cid))
+            );
+        }
+        console.log( " PREDICT " , predict_addr, " lol " , bytes32_cids);
         let blog_address = predict_addr;
 
         const pubkeys = await new_client.getPubKeys(predict_addr);
+        const transformed_keys: Uint8Array[] = [];
+        for(let i = 0; i < pubkeys.length; i += 1){
+            transformed_keys.push(new Uint8Array(pubkeys[i]));
+        }
 
+        console.log("PUB KEYS ARE" , " ", pubkeys);
         const txDeploy = await createTransaction(
             fheBlogFactory["createBlog((bytes[],bytes[][],bytes32[]),string,string,bytes32)"],
             {
-                cid: cids,
+                cid: bytes32_cids,
                 p: keys,
-                publicKey: pubkeys
+                publicKey: transformed_keys
             },  
             'FHE_BLOG',
             'FHBL',
@@ -201,25 +231,35 @@ export const sendText = async(text, instance, metamask_provider)=>{
 
 
 
-export const getText = async(metamask_provider, blog_address)=>{
+export const nftPosession = async (metamask_provider, blog_address, nft)=>{
+    let provider = normalizeProvider(metamask_provider);
+    let signer = await provider.getSigner();
+    const fheBlog = FHE_BLOG__factory.connect(
+        blog_address,
+        signer
+    );
+    const owner = await fheBlog.ownerOf(nft)
+    const is_owner = owner == (await signer.getAddress());
+
+    console.log(`NFT number ${nft}, owner is ${owner}, you're ${is_owner ? 'the owner' : 'not the owner'}`);
+    return is_owner;
+}
+
+export const mintNft = async(metamask_provider, blog_address)=>{
 
     let provider = normalizeProvider(metamask_provider);
+    let signer = await provider.getSigner();
     const new_client = new PnodeClient(relayers);
     console.log(" FHE BLOG " , blog_address);
     const fheBlog = FHE_BLOG__factory.connect(
         blog_address,
-        provider
+        signer
     );
 
     const nft = await fheBlog.s_tokenCounter();
     await fheBlog.mintNft();
 
-    const is_owner = (await fheBlog.ownerOf(nft)) == provider;
-
-    alert("TRUE IF YOU ARE OWNER OF NFT " + is_owner);
-
-
-    return;
+    return nft;
 }
 
 
@@ -227,10 +267,12 @@ export const createTransaction = async <A extends [...{ [I in keyof A]-?: A[I] |
     method: TypedContractMethod<A>,
     ...params: A
   ) => {
-    const gasLimit = await method.estimateGas(...params);
+    // const gasLimit = await method.estimateGas(...params);
+
+    // console.log("GAS LIMIT IS " , gasLimit);
     const updatedParams: ContractMethodArgs<A> = [
       ...params,
-      { gasLimit: 10000000 },
+      { gasLimit: 100000000 },
     ];
     return method(...updatedParams);
 };

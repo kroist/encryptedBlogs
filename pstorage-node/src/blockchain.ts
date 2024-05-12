@@ -25,7 +25,7 @@ export async function initBlockchain(privateKey: string): Promise<BlockchainPara
 }
 
 
-const generatePublicKey = async (contractAddress: string, signer: ethers.Signer, instance: FhevmInstance) => {
+export const generatePublicKey = async (contractAddress: string, signer: ethers.Signer, instance: FhevmInstance) => {
   // Generate token to decrypt
   const generatedToken = instance.generatePublicKey({
     verifyingContract: contractAddress,
