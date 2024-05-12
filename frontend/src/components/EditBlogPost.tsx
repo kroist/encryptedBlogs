@@ -140,7 +140,7 @@ const EditBlogPost = (props) => {
   
 
   const { sdk, connected, connecting, provider, chainId, ready } = useSDK();
-
+    
 
     const changeChain = async () => {
       if(provider == undefined){
