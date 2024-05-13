@@ -94,7 +94,7 @@ export const initFHE = async (metamaskProvider: SDKProvider) => {
 
 
 
-const relayers = ["http://localhost:3002", "http://localhost:3003"]
+const relayers = [process.env.REACT_APP_RELAYER_1, process.env.REACT_APP_RELAYER_1]
 
 // const relayers = ["http://localhost:3002"]
 
