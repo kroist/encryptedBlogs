@@ -1,1 +1,0 @@
-export { shamirShare } from './shamir'
