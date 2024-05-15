@@ -15,6 +15,16 @@ You can't just implement full data decryption system inside smart contracts, bec
 
 That's why we do another approach, where we offload decryption to special relayers.
 
+## Why have relayers?
+
+To enhance the security and integrity of our system, we decided to incorporate relayers as intermediaries between the user and the content, instead of sharing information related to content explicitly with the user.
+
+The primary reason for this design choice is to prevent users from easily sharing the CID and encryption key with others. If users had access to this information, they could potentially develop their own clients to access the blogs for free, possibly using malware.
+
+By using relayers, users do not possess any information about the storage or encryption of the blog content. Additionally, no single relayer has complete knowledge of the content.
+
+Our system employs Shamir's Secret Sharing, ensuring that no single relayer can access the full content of a blog or even a significant portion of it. This security measure remains effective as long as at least one relayer is honest.
+
 ### Definitions
 
 - `Creator` - someone, who wants to encrypt and sell his content through protocol
