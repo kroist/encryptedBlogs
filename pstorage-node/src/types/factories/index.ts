@@ -2,4 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export { FHEBlogFactory__factory } from "./FHEBlogFactory__factory";
+export { FHEBlogFactoryCrutch__factory } from "./FHEBlogFactoryCrutch__factory";
 export { FHE_BLOG__factory } from "./FHE_BLOG__factory";
+export { FHE_BLOGCrutch__factory } from "./FHE_BLOGCrutch__factory";

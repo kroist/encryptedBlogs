@@ -21,7 +21,7 @@ export class Pnode {
     return response.data.cid;
   }
 
-  public async retrieve(cid: string): Promise<string> {
+  public async retrieve_past(cid: string): Promise<string> {
     let response = await this.client.get('/retrieve', {params: {cid}});
     return response.data.data;
   }
@@ -36,16 +36,19 @@ export class Pnode {
     data.signature
   );
   */
-  public async retrieve_decrypted(blog_id: string, nft_id : string, relayer_id : string,  caller, nonce, signature): Promise<string> {
+  public async retrieve(blog_addr: string, nft_id : string, relayer_id,  caller, nonce, signature): Promise<string> {
+    console.log("We Are in retrieve \n");
+    console.log(blog_addr , nft_id , relayer_id , caller , nonce , signature)
+    
     let response = await this.client.post('/retrieve_decrypt', {
-      blod_id : blog_id,
-      nft_id : nft_id,
+      blog_addr : blog_addr,
+      nft_id : String(nft_id),
       relayer_id : relayer_id,
       caller : caller,
-      nonce : nonce,
+      nonce : String(nonce),
       signature : signature
     });
-    return response.data.data;
+    return response.data.dataDecr;
   }
   
   public async getPubKey(contract_addr : string): Promise<Uint8Array> {
@@ -86,11 +89,20 @@ export class PnodeClient {
     return cids;
   }
 
-  public async retrieve(cids: string[]): Promise<string> {
+  public async retrieve_past(cids: string[]): Promise<string> {
     let shares = [];
     for (let i = 0; i < cids.length; i++) {
-      shares.push(await this.nodes[i].retrieve(cids[i]));
+      shares.push(await this.nodes[i].retrieve_past(cids[i]));
     }
+    return await shamirCombine(shares);
+  }
+
+  public async retrieve(blog_addr: string, nft_id : string, caller, nonces, signatures): Promise<string> {
+    let shares = [];
+    for (let i = 0; i < signatures.length; i++) {
+      shares.push(await this.nodes[i].retrieve(blog_addr, nft_id, i, caller, nonces[i], signatures[i]));
+    }
+    console.log(" SHARES ARE " , shares);
     return await shamirCombine(shares);
   }
 
@@ -98,7 +110,7 @@ export class PnodeClient {
     let shares = [];
     for (let i = 0; i < cids.length; i++) {
       shares.push(await decryptWithKey(
-        await this.nodes[i].retrieve(cids[i]),
+        await this.nodes[i].retrieve_past(cids[i]),
         pkeys[i],
       ));
     }

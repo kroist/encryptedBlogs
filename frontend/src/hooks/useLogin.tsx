@@ -5,8 +5,11 @@ import { BrowserProvider, parseUnits } from "ethers";
 
 // Import from a specific export
 import { HDNodeWallet } from "ethers/wallet";
-import { FHEBlogFactory__factory } from "../types/factories/FHEBlogFactory__factory.ts";
+import { FHEBlogFactory__factory  } from "../types/factories/FHEBlogFactory__factory.ts";
 import { FHE_BLOG__factory } from "../types/factories/FHE_BLOG__factory.ts";
+import {FHEBlogFactoryCrutch__factory} from '../types/factories/FHEBlogFactoryCrutch__factory.ts'
+import { FHE_BLOGCrutch__factory } from "../types/factories/FHE_BLOGCrutch__factory.ts";
+
 // import "pstoragesdk";
 
 import { TypedContractMethod } from "../types/common";
@@ -29,6 +32,17 @@ const decodeIpfsHash = (input)=>{
       // Using Buffer to convert Uint8Array to a readable string (optional)
     const result = Buffer.from(bytes).toString('hex');
     return result;
+}
+
+const encodeToIpfsHash = (hexInput) => {
+  // Convert the hexadecimal string back to a byte array (Buffer)
+  const cleanHex = hexInput.startsWith('0x') ? hexInput.slice(2) : hexInput;
+ 
+  
+  const buffer = Buffer.from(cleanHex, 'hex');
+  // Encode the byte array using Base58
+  const encoded = bs58.encode(buffer);
+  return encoded;
 }
 
 const addChaing = async()=>{
@@ -197,7 +211,7 @@ export const sendText = async(text, instance, metamask_provider)=>{
                 addZero(decodeIpfsHash(cid))
             );
         }
-        console.log( " PREDICT " , predict_addr, " lol " , bytes32_cids);
+       
         let blog_address = predict_addr;
 
         const pubkeys = await new_client.getPubKeys(predict_addr);
@@ -206,8 +220,10 @@ export const sendText = async(text, instance, metamask_provider)=>{
             transformed_keys.push(new Uint8Array(pubkeys[i]));
         }
 
-        console.log("PUB KEYS ARE" , " ", pubkeys);
-        
+        // console.log("PUB KEYS ARE" , " ", pubkeys);
+        console.log( " PREDICT " , predict_addr);
+        console.log(" CIDs ", cids);
+        console.log(" Ps ", keys);
         // const txDeploy = await createTransaction(
         //     fheBlogFactory["createBlog((bytes[],bytes[][],bytes32[]),string,string,bytes32)"],
         //     {
@@ -220,7 +236,7 @@ export const sendText = async(text, instance, metamask_provider)=>{
         //     randomSalt
         //   );
 
-        console.log(keys);
+        console.log(" ENCRYPED KEYS ARE " , keys);
 
         const txDeploy = await fheBlogFactory["createBlog((bytes[],bytes32[]),bytes[2][],string,string,bytes32)"](
           {
@@ -247,13 +263,133 @@ export const sendText = async(text, instance, metamask_provider)=>{
 
 }
 
-export const generateSignature = async(metamask_provider , blog_address, relayer_id)=>{
+
+const factoryAddressCrutch = "0x3a71873c01853b6a3189E03c092f698303b73967";
+  
+
+function toUint64(n) {
+  return BigInt.asUintN(64, n);
+}
+export const sendTextCrutch = async(text, instance, metamask_provider)=>{
+    
+
+  const res = await instance.encrypt64(12351);
+
+  console.log("sendText encryption is working " , res);
+  let provider = normalizeProvider(metamask_provider);
+  let signer = await provider.getSigner();
+  console.log("signer is " , await provider.getNetwork())
+  console.log("signer is " , await signer.getAddress());
+
+
+  const new_client = new PnodeClient(relayers);
+
+  let not_serialized_promise: Promise<any>[] = [];
+  for(let i = 0; i < relayers.length; i += 1){
+    not_serialized_promise.push(genKey())
+  } 
+  let not_serialized_keys = await Promise.all(not_serialized_promise); // p
+
+
+  console.log("the keys are " , not_serialized_keys);
+  console.log("afetr serialization " , await serializeKey(not_serialized_keys[0]));
+
+  let cnt_relayers = relayers.length;
+
+  let keys: [ethers.uint64, ethers.uint64][] = [];
+  for(let i = 0; i < cnt_relayers; i += 1){
+      let serialized_key = await serializeKey(not_serialized_keys[i]);
+      console.log(" THE NEW KEY IS " ,  toUint64(serialized_key[0]), ' ', toUint64(serialized_key[1]));
+      keys.push([
+        toUint64(serialized_key[0]),
+        toUint64(serialized_key[1])
+      ]);
+  }
+
+
+  
+  // generate array of random Uint8
+  let randomSalt = new Uint8Array(32);
+  for (let i = 0; i < 32; i++) {
+      randomSalt[i] = Math.floor(Math.random() * 256);
+  }
+  try{
+      const cids : any[] = await new_client.storeEncrypted(stringToHex(text), not_serialized_keys);
+
+      const fheBlogFactory = FHEBlogFactoryCrutch__factory.connect(
+          factoryAddressCrutch,
+          signer
+      );
+    
+      const predict_addr = await fheBlogFactory.getBlogAddress(randomSalt);
+
+
+      let bytes32_cids : string[] = [];
+      for(let cid of cids){
+          bytes32_cids.push(
+              addZero(decodeIpfsHash(cid))
+          );
+      }
+      
+      console.log( " PREDICT " , predict_addr);
+      console.log(" CIDs ", cids);
+      console.log(" Ps ", keys);
+      
+      let blog_address = predict_addr;
+
+      const pubkeys = await new_client.getPubKeys(predict_addr);
+      const transformed_keys: Uint8Array[] = [];
+      for(let i = 0; i < pubkeys.length; i += 1){
+          transformed_keys.push(new Uint8Array(pubkeys[i]));
+      }
+
+     
+      // const txDeploy = await createTransaction(
+      //     fheBlogFactory["createBlog((bytes[],bytes[][],bytes32[]),string,string,bytes32)"],
+      //     {
+      //         cid: bytes32_cids,
+      //         p: keys,
+      //         publicKey: transformed_keys
+      //     },  
+      //     'FHE_BLOG',
+      //     'FHBL',
+      //     randomSalt
+      //   );
+
+      console.log(" ENCRYPED KEYS ARE " , keys);
+
+      const txDeploy = await fheBlogFactory["createBlog((bytes[],uint64[2][],bytes32[]),string,string,bytes32)"](
+        {
+            cid: bytes32_cids,
+            p: keys,
+            publicKey: transformed_keys
+        },  
+        'FHE_BLOG',
+        'FHBL',
+        randomSalt,
+        {
+          gasLimit: 10000000
+        }
+      );
+      await txDeploy.wait();
+      
+      console.log("deployed");
+      console.log()
+      return blog_address;
+     
+  }catch(error){
+      console.log("error " , error);
+  }
+
+}
+
+
+export const generateSignature = async(metamask_provider , blog_address, relayer_id, nonce)=>{
     let provider = normalizeProvider(metamask_provider);
     let signer = await provider.getSigner();
     let signer_addr = await signer.getAddress();
 
-    const blog_contract = FHE_BLOG__factory.connect(blog_address, signer);
-    let nonce = blog_contract.latest_nonce(signer_addr);
+
 
     let abiencoder = new ethers.AbiCoder();
     let encoded = abiencoder.encode(["uint256", "uint256"], [relayer_id, nonce]);
@@ -262,15 +398,38 @@ export const generateSignature = async(metamask_provider , blog_address, relayer
     const signature = await signer.signMessage(messageBytes );
     return signature;
 }
+function generateRandomUint64() {
+  // Generate a random 32-bit unsigned integer twice and combine them
+  const part1 = BigInt(Math.floor(Math.random() * 2**32));
+  const part2 = BigInt(Math.floor(Math.random() * 2**32));
+  return (part1 << 32n) | part2;
+}
 
-export const requestAccess = async(metamask_provider , blog_address)=>{
-  let signatures = [];
+export const requestAccess = async(metamask_provider , blog_address, nft_token, callback = null)=>{
+
+  const provider = normalizeProvider(metamask_provider);
+  const signer = await provider.getSigner();
+  const our_address = await signer.getAddress();
+  let signatures : any[] = [];
+  let nonces : bigint[] = [];
+  const blog_contract = FHE_BLOGCrutch__factory.connect(blog_address, provider);
+  
+  
   for(let i = 0; i < relayers.length; i += 1){
-    signatures.push(await generateSignature(metamask_provider, blog_address, i));
-  }
+    const cur_nonce = generateRandomUint64();
+    if(callback != null){
+      callback(`Generating signature for ${i+1}th relayer`)
+    }
+    signatures.push(await generateSignature(metamask_provider, blog_address, i, cur_nonce));
 
+    console.log("SIGNATURE IS " , signatures);
+    nonces.push(cur_nonce);
+  }
+  if(callback != null){
+    callback(`Waiting for response from relayers`)
+  }
   const client = new PnodeClient(relayers);
-  client.retrieve_decrypted
+  return await client.retrieve(blog_address, nft_token, our_address, nonces, signatures);
 }
 
 

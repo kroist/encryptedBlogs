@@ -8,9 +8,10 @@ import MDEditor from '@uiw/react-md-editor';
 import { useSDK } from "@metamask/sdk-react-ui";
 import Loading from './Loading.tsx'
 // import {dataUriToBlobUrl, transformUrlToBase64, changeUrlToBase64, changeUrlToNormal} from '../hooks/utils.tsx'
-import {sendText, getText, initFHE, nftPosession, mintNft} from '../hooks/useLogin.tsx'
+import {sendText, getText, initFHE, nftPosession, mintNft, sendTextCrutch} from '../hooks/useLogin.tsx'
 import BlogPreviewInput from './BlogPreviewInput.tsx';
 import {publishPublicPreview} from '../hooks/publicPreview.tsx'
+import ThemeContext from '../ThemeContext.tsx'
 function dataUriToBlobUrl(dataURI) {
   // Split the base64 string into parts to extract the data and the encoding
   const parts = dataURI.split(';base64,');
@@ -256,7 +257,7 @@ const EditBlogPost = (props) => {
       alert("True if you're owner of it" + await nftPosession(provider, some, nft_token));
   }
   const [kek, setKek] = useState()
- 
+  const theme = useContext(ThemeContext);
   const [loading, setLoading] = useState(false);
   const submitEdit = ()=>{
     setLoading(true);
@@ -265,7 +266,8 @@ const EditBlogPost = (props) => {
       headline: headline,
       description: description,
       author: 'Daniel',
-      date: prettyDate(new Date())
+      date: prettyDate(new Date()),
+      address: blog.current
     }
 
     publishPublicPreview(publicPreview).then(response=>{
@@ -275,11 +277,11 @@ const EditBlogPost = (props) => {
   }
 
 
-    return (<div style={{width: '100%', height: '100vh', display: 'flex', flexDirection: 'column',alignItems: 'center', height: '100vh'}}>
+    return (<div style={{width: '100%',  display: 'flex', flexDirection: 'column',alignItems: 'center'}}>
 
      
      
-     <div className="container" style={{maxWidth: '1080px', width: '70%', height: '70%', marginTop: '30px'}}>
+     <div className="container" style={{maxWidth: '1080px', width: '70%', height: '50vh', marginTop: '30px'}}>
 
         <MDEditor 
         height={'70%'}
@@ -293,9 +295,21 @@ const EditBlogPost = (props) => {
       <BlogPreviewInput headline={headline} setHeadline={setHeadline} description={description} setDescription={setDescription}/>
 
 
-      <button className="bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline"
+
+      <div style={{width: '100%', display: 'flex', flexDirection: 'column',alignItems: 'center'}}>
+      <button className="bg-black mt-5 text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline"
       onClick={async (e)=>{
         
+        if(inputValue == '' || headline == '' || description == ''){
+          alert("Please fill all the fields");
+          return;
+        }
+
+
+        theme.setShadowLoading(true);
+
+
+
         await initFHEVM();
 
         const nwText = await changeUrlToBase64(inputValue);
@@ -307,36 +321,28 @@ const EditBlogPost = (props) => {
 
         blog.current = await sendText(nwText, fhevmInstance.current, provider);
 
+        await submitEdit();
+
+
+        theme.setShadowLoading(false);
+
+        
+
         console.log("successfully sent to blockchain " , blog.current);
         
         
         return;
-        const backText = await changeToNormal(nwText);
-
-
-        console.log(backText);
-
-        setInputValue(backText);
+        
         
       }}>
           Save your blog
       </button>
 
-      <button className="bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline" onClick={(e)=>{
-        testNftMint();
-      }}>
-        Test Nft mint
-      </button>
-
-
-      <button className="bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline" onClick={(e)=>{
-        submitEdit();
-      }}>
-        Test publish public
-      </button>
-
+      
 
         <Loading loading={loading} />
+      </div>
+
       </div>
 </div>
     );

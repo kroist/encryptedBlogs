@@ -23,25 +23,25 @@ import type {
   TypedContractMethod,
 } from "./common";
 
-export type DecryptedBlogStruct = { p: [BytesLike, BytesLike] };
+export type DecryptedBlogStruct = { p: [BigNumberish, BigNumberish] };
 
-export type DecryptedBlogStructOutput = [p: [string, string]] & {
-  p: [string, string];
+export type DecryptedBlogStructOutput = [p: [bigint, bigint]] & {
+  p: [bigint, bigint];
 };
 
 export type BlogStorageStruct = {
   cid: BytesLike[];
-  p: BytesLike[][];
+  p: [BigNumberish, BigNumberish][];
   publicKey: BytesLike[];
 };
 
 export type BlogStorageStructOutput = [
   cid: string[],
-  p: string[][],
+  p: [bigint, bigint][],
   publicKey: string[]
-] & { cid: string[]; p: string[][]; publicKey: string[] };
+] & { cid: string[]; p: [bigint, bigint][]; publicKey: string[] };
 
-export interface FHE_BLOGInterface extends Interface {
+export interface FHE_BLOGCrutchInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "TOKEN_URI"
@@ -304,11 +304,11 @@ export namespace TransferEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export interface FHE_BLOG extends BaseContract {
-  connect(runner?: ContractRunner | null): FHE_BLOG;
+export interface FHE_BLOGCrutch extends BaseContract {
+  connect(runner?: ContractRunner | null): FHE_BLOGCrutch;
   waitForDeployment(): Promise<this>;
 
-  interface: FHE_BLOGInterface;
+  interface: FHE_BLOGCrutchInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
