@@ -80,9 +80,9 @@ export const initFHE = async (metamaskProvider: SDKProvider) => {
 
 
 
-const relayers = ["http://localhost:3002", "http://localhost:3003"]
+const relayers = [process.env.REACT_APP_RELAYER_1, process.env.REACT_APP_RELAYER_1]
 
-const factoryAddress = '0x2d31186A1Cae2Bf56dfC3076ef6B90a39bF6bdd9';
+const factoryAddress = '0xfB08EaD86e96682EB8782029465d1ce167443E69';
 // const factoryAddress = '0x4Fa39D4AfaB4d1ed2179Fe9637EEF5aAE2598D93';
 const generatePublicKey = async (contractAddress: string, signer: ethers.Signer, instance: FhevmInstance) => {
     // Generate token to decrypt
@@ -222,12 +222,12 @@ export const sendText = async(text, instance, metamask_provider)=>{
 
         console.log(keys);
 
-        const txDeploy = await fheBlogFactory["createBlog((bytes[],bytes[2][],bytes32[]),string,string,bytes32)"](
+        const txDeploy = await fheBlogFactory["createBlog((bytes[],bytes32[]),bytes[2][],string,string,bytes32)"](
           {
               cid: bytes32_cids,
-              p: keys,
               publicKey: transformed_keys
           },  
+          keys,
           'FHE_BLOG',
           'FHBL',
           randomSalt,

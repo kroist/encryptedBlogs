@@ -29,17 +29,12 @@ export type DecryptedBlogStructOutput = [p: [string, string]] & {
   p: [string, string];
 };
 
-export type BlogStorageStruct = {
-  cid: BytesLike[];
-  p: BytesLike[][];
-  publicKey: BytesLike[];
-};
+export type BlogStorageStruct = { cid: BytesLike[]; publicKey: BytesLike[] };
 
-export type BlogStorageStructOutput = [
-  cid: string[],
-  p: string[][],
-  publicKey: string[]
-] & { cid: string[]; p: string[][]; publicKey: string[] };
+export type BlogStorageStructOutput = [cid: string[], publicKey: string[]] & {
+  cid: string[];
+  publicKey: string[];
+};
 
 export interface FHE_BLOGInterface extends Interface {
   getFunction(
@@ -114,7 +109,7 @@ export interface FHE_BLOGInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [BlogStorageStruct, string, string]
+    values: [BlogStorageStruct, [BytesLike, BytesLike][], string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -389,7 +384,12 @@ export interface FHE_BLOG extends BaseContract {
   increaseNonce: TypedContractMethod<[], [void], "nonpayable">;
 
   initialize: TypedContractMethod<
-    [_data: BlogStorageStruct, _nft_name: string, _nft_short_name: string],
+    [
+      _data: BlogStorageStruct,
+      _p: [BytesLike, BytesLike][],
+      _nft_name: string,
+      _nft_short_name: string
+    ],
     [void],
     "nonpayable"
   >;
@@ -519,7 +519,12 @@ export interface FHE_BLOG extends BaseContract {
   getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<
-    [_data: BlogStorageStruct, _nft_name: string, _nft_short_name: string],
+    [
+      _data: BlogStorageStruct,
+      _p: [BytesLike, BytesLike][],
+      _nft_name: string,
+      _nft_short_name: string
+    ],
     [void],
     "nonpayable"
   >;
