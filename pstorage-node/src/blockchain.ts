@@ -1,9 +1,11 @@
 import { ethers } from 'ethers';
 import { FHEBlogFactory__factory } from './types/factories/FHEBlogFactory__factory.js';
+
 import { createInstance, FhevmInstance, getPublicKeyCallParams } from 'fhevmjs/node';
 import { FHE_BLOG__factory } from './types/factories/FHE_BLOG__factory.js';
+import { FHE_BLOGCrutch__factory } from './types/factories/FHE_BLOGCrutch__factory.js';
 import { parseKey } from './crypto.js';
-
+import bs58 from 'bs58'
 const factoryAddress = '0x294bf3D0323E38A04210C75Eb2D7Eaf7c92C7862';
 
 class BlockchainParams {
@@ -61,9 +63,58 @@ export const createFhevmInstance = async (contractAddress: string, account: ethe
   return instance;
 };
 
+const encodeToIpfsHash = (hexInput) => {
+    // Convert the hexadecimal string back to a byte array (Buffer)
+    const cleanHex = hexInput.startsWith('0x') ? hexInput.slice(2) : hexInput;
+   
+    
+    const buffer = Buffer.from(cleanHex, 'hex');
+    // Encode the byte array using Base58
+    const encoded = bs58.encode(buffer);
+    return encoded;
+}
+export async function getKeyAndCidFromBlockchainCrutch(
+  params: BlockchainParams,
+  blogAddress: string,
+  nft_id: ethers.BigNumberish,
+  relayer_id: ethers.BigNumberish,
+  caller: ethers.AddressLike,
+  nonce: ethers.BigNumberish,
+  signature: Uint8Array
+){
+  const blog = FHE_BLOGCrutch__factory.connect(blogAddress, params.provider);
+
+
+  await generatePublicKey(blogAddress, params.signer, params.fhevmInstance);
+
+
+  console.log("SENDING it ");
+  const {p} = await blog.generateJwt(
+    nft_id,
+    relayer_id,
+    caller,
+    nonce,
+    signature,
+  );
+
+  console.log(" GOT IT ", p );
+  const cid = await blog.getCid(relayer_id);
+
+
+  let normal_cid = encodeToIpfsHash(cid);
+  
+  console.log("GOT CID " , cid , " WTF " , normal_cid);
+  const k1: bigint = p[0];
+  const k2: bigint = p[1];
+
+  return {
+    cid: normal_cid,
+    key: await parseKey(k1, k2)
+  }
+}
 export async function getKeyAndCidFromBlockchain(
   params: BlockchainParams,
-  blog_id: bigint,
+  blogAddress: string,
   nft_id: ethers.BigNumberish,
   relayer_id: ethers.BigNumberish,
   caller: ethers.AddressLike,
@@ -75,13 +126,13 @@ export async function getKeyAndCidFromBlockchain(
     factoryAddress,
     params.provider
   );
-  const blogCount = await fheBlogFactory.blogsCount();
+  // const blogCount = await fheBlogFactory.blogsCount();
   
-  if (blog_id >= blogCount) {
-    throw new Error('Blog does not exist');
-  }
+  // if (blog_id >= blogCount) {
+  //   throw new Error('Blog does not exist');
+  // }
 
-  const blogAddress = await fheBlogFactory.blogs(blog_id);
+  // const blogAddress = await fheBlogFactory.blogs(blog_id);
 
   const blog = FHE_BLOG__factory.connect(blogAddress, params.provider);
 

@@ -27,7 +27,7 @@ const App = () => {
       <ThemeContext.Provider value={{setShadowLoading: setShadowLoading}} >
 
         {shadowLoading == true ? 
-          <div className="w-full h-full fixed flex items-center justify-center inset-0 bg-black bg-opacity-50 lg:bg-opacity-25">
+          <div className="w-full h-full fixed flex items-center justify-center inset-0 bg-black bg-opacity-50 lg:bg-opacity-25 z-50">
           <Loading loading={shadowLoading} />
       </div>: <></>} 
          <NavBar />

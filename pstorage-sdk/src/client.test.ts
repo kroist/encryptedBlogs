@@ -26,7 +26,7 @@ describe('pnode client', async () => {
     const text = '1234asdasd';
     const textHex = Buffer.from(text, 'utf-8').toString('hex');
     const shares = await client.store(textHex);
-    const retrieveHex = await client.retrieve(shares);
+    const retrieveHex = await client.retrieve_past(shares);
     const retrieve = Buffer.from(retrieveHex, 'hex').toString();
     chai.expect(retrieve).to.equal(text);
   }).timeout(60000);
@@ -44,7 +44,7 @@ describe('pnode client', async () => {
     chai.expect(text.length).to.eq(1<<20);
     const textHex = Buffer.from(text, 'utf-8').toString('hex');
     const shares = await client.store(textHex);
-    const retrieveHex = await client.retrieve(shares);
+    const retrieveHex = await client.retrieve_past(shares);
     const retrieve = Buffer.from(retrieveHex, 'hex').toString();
     chai.expect(retrieve).to.equal(text);
   }).timeout(60000);
