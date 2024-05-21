@@ -6,7 +6,7 @@ import { extract } from 'it-tar'
 import map from 'it-map'
 import all from 'it-all';
 import { decryptWithKey, parseKey } from './crypto.js';
-import { getKeyAndCidFromBlockchain, initBlockchain, generatePublicKey } from './blockchain.js';
+import { getKeyAndCidFromBlockchainCrutch, getKeyAndCidFromBlockchain, initBlockchain, generatePublicKey } from './blockchain.js';
 import cors from 'cors'
 
 let cid = CID.parse('QmSnuWmxptJZdLJpKRarxBMS2Ju2oANVrgbr2xWbie9b2D');
@@ -65,7 +65,7 @@ app.get('/retrieve', async (req: Request, res: Response) => {
   const client = create({ url: 'http://127.0.0.1:5001/api/v0' });
   const unparsedData = ((await pipe(
     await client.get(CID.parse(cid)),
-    tarballed,
+    tarballed,  
     (source) => all(source)
   ))[0]).body;
   const data = new TextDecoder('utf-8').decode(unparsedData);
@@ -73,10 +73,13 @@ app.get('/retrieve', async (req: Request, res: Response) => {
 });
 
 app.post('/retrieve_decrypt', async (req: Request, res: Response) => {
-  const data = req.body.data;
-  const {cid, key} = await getKeyAndCidFromBlockchain(
+  const data = req.body;
+
+  console.log("data is " , data);
+
+  const {cid, key} = await getKeyAndCidFromBlockchainCrutch(
     blockchainParams,
-    data.blog_id,
+    data.blog_addr,
     data.nft_id,
     data.relayer_id,
     data.caller,
@@ -84,12 +87,17 @@ app.post('/retrieve_decrypt', async (req: Request, res: Response) => {
     data.signature
   );
 
+
+  
   const client = create({ url: 'http://127.0.0.1:5001/api/v0' });
   const unparsedData = ((await pipe(
     await client.get(CID.parse(cid)),
     tarballed,
     (source) => all(source)
   ))[0]).body;
+
+  console.log(" unparsed is " , unparsedData);
+
   const dataEncr = new TextDecoder('utf-8').decode(unparsedData);
   const dataDecr = await decryptWithKey(
     dataEncr,

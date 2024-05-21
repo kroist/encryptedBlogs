@@ -10,6 +10,7 @@ import { getBlogPreview } from '../hooks/publicPreview.tsx';
 import {addNft} from '../hooks/storage.tsx'
 import {mintNft} from '../hooks/useLogin.tsx'
 import ThemeContext from '../ThemeContext.tsx';
+import LoadContent from './LoadContent.tsx'
 function BlogCheckout() {
     const [loading, setLoading] = useState(true);
     const [loadingCaption, setLoadingCaption] = useState("Loading blog info...");
@@ -127,7 +128,7 @@ function BlogCheckout() {
 
         {loading == false && have_access == true && 
         <div>
-            We should try to load content here
+            <LoadContent provider={provider} blogAddress={blogAddress.current} />
         </div>
         }
 

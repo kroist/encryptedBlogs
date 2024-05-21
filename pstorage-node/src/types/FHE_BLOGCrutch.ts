@@ -23,20 +23,25 @@ import type {
   TypedContractMethod,
 } from "./common";
 
-export type DecryptedBlogStruct = { p: [BytesLike, BytesLike] };
+export type DecryptedBlogStruct = { p: [BigNumberish, BigNumberish] };
 
-export type DecryptedBlogStructOutput = [p: [string, string]] & {
-  p: [string, string];
+export type DecryptedBlogStructOutput = [p: [bigint, bigint]] & {
+  p: [bigint, bigint];
 };
 
-export type BlogStorageStruct = { cid: BytesLike[]; publicKey: BytesLike[] };
-
-export type BlogStorageStructOutput = [cid: string[], publicKey: string[]] & {
-  cid: string[];
-  publicKey: string[];
+export type BlogStorageStruct = {
+  cid: BytesLike[];
+  p: [BigNumberish, BigNumberish][];
+  publicKey: BytesLike[];
 };
 
-export interface FHE_BLOGInterface extends Interface {
+export type BlogStorageStructOutput = [
+  cid: string[],
+  p: [bigint, bigint][],
+  publicKey: string[]
+] & { cid: string[]; p: [bigint, bigint][]; publicKey: string[] };
+
+export interface FHE_BLOGCrutchInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "TOKEN_URI"
@@ -109,7 +114,7 @@ export interface FHE_BLOGInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [BlogStorageStruct, [BytesLike, BytesLike][], string, string]
+    values: [BlogStorageStruct, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -299,11 +304,11 @@ export namespace TransferEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export interface FHE_BLOG extends BaseContract {
-  connect(runner?: ContractRunner | null): FHE_BLOG;
+export interface FHE_BLOGCrutch extends BaseContract {
+  connect(runner?: ContractRunner | null): FHE_BLOGCrutch;
   waitForDeployment(): Promise<this>;
 
-  interface: FHE_BLOGInterface;
+  interface: FHE_BLOGCrutchInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -384,12 +389,7 @@ export interface FHE_BLOG extends BaseContract {
   increaseNonce: TypedContractMethod<[], [void], "nonpayable">;
 
   initialize: TypedContractMethod<
-    [
-      _data: BlogStorageStruct,
-      _p: [BytesLike, BytesLike][],
-      _nft_name: string,
-      _nft_short_name: string
-    ],
+    [_data: BlogStorageStruct, _nft_name: string, _nft_short_name: string],
     [void],
     "nonpayable"
   >;
@@ -519,12 +519,7 @@ export interface FHE_BLOG extends BaseContract {
   getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<
-    [
-      _data: BlogStorageStruct,
-      _p: [BytesLike, BytesLike][],
-      _nft_name: string,
-      _nft_short_name: string
-    ],
+    [_data: BlogStorageStruct, _nft_name: string, _nft_short_name: string],
     [void],
     "nonpayable"
   >;
