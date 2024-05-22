@@ -319,7 +319,7 @@ const EditBlogPost = (props) => {
         console.log("fhevm instance is " , fhevmInstance.current);
 
 
-        blog.current = await sendTextCrutch(nwText, fhevmInstance.current, provider);
+        blog.current = await sendText(nwText, fhevmInstance.current, provider);
 
         await submitEdit();
 

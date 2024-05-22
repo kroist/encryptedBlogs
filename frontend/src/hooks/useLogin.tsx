@@ -98,7 +98,7 @@ const relayers = [process.env.REACT_APP_RELAYER_1, process.env.REACT_APP_RELAYER
 
 // const relayers = ["http://localhost:3002"]
 
-const factoryAddress = '0x2d31186A1Cae2Bf56dfC3076ef6B90a39bF6bdd9';
+const factoryAddress = '0xfB08EaD86e96682EB8782029465d1ce167443E69';
 // const factoryAddress = '0x4Fa39D4AfaB4d1ed2179Fe9637EEF5aAE2598D93';
 const generatePublicKey = async (contractAddress: string, signer: ethers.Signer, instance: FhevmInstance) => {
     // Generate token to decrypt
@@ -226,26 +226,15 @@ export const sendText = async(text, instance, metamask_provider)=>{
         console.log( " PREDICT " , predict_addr);
         console.log(" CIDs ", cids);
         console.log(" Ps ", keys);
-        // const txDeploy = await createTransaction(
-        //     fheBlogFactory["createBlog((bytes[],bytes[][],bytes32[]),string,string,bytes32)"],
-        //     {
-        //         cid: bytes32_cids,
-        //         p: keys,
-        //         publicKey: transformed_keys
-        //     },  
-        //     'FHE_BLOG',
-        //     'FHBL',
-        //     randomSalt
-        //   );
 
         console.log(" ENCRYPED KEYS ARE " , keys);
 
-        const txDeploy = await fheBlogFactory["createBlog((bytes[],bytes[2][],bytes32[]),string,string,bytes32)"](
+        const txDeploy = await fheBlogFactory["createBlog((bytes[],bytes32[]),bytes[2][],string,string,bytes32)"](
           {
               cid: bytes32_cids,
-              p: keys,
               publicKey: transformed_keys
           },  
+          keys,
           'FHE_BLOG',
           'FHBL',
           randomSalt,
@@ -386,18 +375,37 @@ export const sendTextCrutch = async(text, instance, metamask_provider)=>{
 }
 
 
-export const generateSignature = async(metamask_provider , blog_address, relayer_id, nonce)=>{
+export const generateSignature = async(nft_token, metamask_provider , blog_address, relayer_id, nonce)=>{
     let provider = normalizeProvider(metamask_provider);
     let signer = await provider.getSigner();
     let signer_addr = await signer.getAddress();
 
 
+    const domain = {
+      name: "FheBlog",
+      version: "1",            
+      chainId: (await signer.provider.getNetwork()).chainId,              
+      verifyingContract: blog_address
+    };
+  
+    const types = {
+      Data: [
+        { name: "nft", type: "uint256" },
+        { name: "relayer_id", type: "uint8" },
+        { name: "caller", type: "address" },
+        { name: "nonce", type: "uint256" }
+      ]
+    };
+  
+    const data = {
+      nft: nft_token,
+      relayer_id,
+      caller: signer.address,
+      nonce
+    };
 
-    let abiencoder = new ethers.AbiCoder();
-    let encoded = abiencoder.encode(["uint256", "uint256"], [relayer_id, nonce]);
-    const hash = ethers.keccak256(encoded);
-    const messageBytes = Buffer.from(hash.slice(2), 'hex');
-    const signature = await signer.signMessage(messageBytes );
+    const signature = await signer.signTypedData(domain, types, data);
+
     return signature;
 }
 function generateRandomUint64() {
@@ -422,7 +430,7 @@ export const requestAccess = async(metamask_provider , blog_address, nft_token, 
     if(callback != null){
       callback(`Generating signature for ${i+1}th relayer`)
     }
-    signatures.push(await generateSignature(metamask_provider, blog_address, i, cur_nonce));
+    signatures.push(await generateSignature(nft_token, metamask_provider, blog_address, i, cur_nonce));
 
     console.log("SIGNATURE IS " , signatures);
     nonces.push(cur_nonce);
@@ -462,7 +470,7 @@ export const mintNft = async(metamask_provider, blog_address)=>{
     );
 
     const nft = await fheBlog.s_tokenCounter();
-    await fheBlog.mintNft();
+    await fheBlog.mintNft({value: ethers.parseEther("0.01")});
 
     return nft;
 }

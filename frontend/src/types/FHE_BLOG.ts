@@ -29,17 +29,12 @@ export type DecryptedBlogStructOutput = [p: [string, string]] & {
   p: [string, string];
 };
 
-export type BlogStorageStruct = {
-  cid: BytesLike[];
-  p: BytesLike[][];
-  publicKey: BytesLike[];
-};
+export type BlogStorageStruct = { cid: BytesLike[]; publicKey: BytesLike[] };
 
-export type BlogStorageStructOutput = [
-  cid: string[],
-  p: string[][],
-  publicKey: string[]
-] & { cid: string[]; p: string[][]; publicKey: string[] };
+export type BlogStorageStructOutput = [cid: string[], publicKey: string[]] & {
+  cid: string[];
+  publicKey: string[];
+};
 
 export interface FHE_BLOGInterface extends Interface {
   getFunction(
@@ -58,6 +53,7 @@ export interface FHE_BLOGInterface extends Interface {
       | "latest_nonce"
       | "mintNft"
       | "name"
+      | "owner"
       | "ownerOf"
       | "reward"
       | "s_tokenCounter"
@@ -90,7 +86,7 @@ export interface FHE_BLOGInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "claimReward",
-    values: [BigNumberish, AddressLike, BigNumberish, BytesLike]
+    values: [BigNumberish, BigNumberish, AddressLike, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "generateJwt",
@@ -114,7 +110,7 @@ export interface FHE_BLOGInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [BlogStorageStruct, string, string]
+    values: [BlogStorageStruct, [BytesLike, BytesLike][], string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -126,6 +122,7 @@ export interface FHE_BLOGInterface extends Interface {
   ): string;
   encodeFunctionData(functionFragment: "mintNft", values?: undefined): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
     values: [BigNumberish]
@@ -162,7 +159,7 @@ export interface FHE_BLOGInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "verifySignature",
-    values: [BigNumberish, BigNumberish, AddressLike, BytesLike]
+    values: [BigNumberish, BigNumberish, BigNumberish, AddressLike, BytesLike]
   ): string;
 
   decodeFunctionResult(functionFragment: "TOKEN_URI", data: BytesLike): Result;
@@ -200,6 +197,7 @@ export interface FHE_BLOGInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "mintNft", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "reward", data: BytesLike): Result;
   decodeFunctionResult(
@@ -359,6 +357,7 @@ export interface FHE_BLOG extends BaseContract {
 
   claimReward: TypedContractMethod<
     [
+      nft: BigNumberish,
       relayer_id: BigNumberish,
       caller: AddressLike,
       _nonce: BigNumberish,
@@ -389,7 +388,12 @@ export interface FHE_BLOG extends BaseContract {
   increaseNonce: TypedContractMethod<[], [void], "nonpayable">;
 
   initialize: TypedContractMethod<
-    [_data: BlogStorageStruct, _nft_name: string, _nft_short_name: string],
+    [
+      _data: BlogStorageStruct,
+      _p: [BytesLike, BytesLike][],
+      _nft_name: string,
+      _nft_short_name: string
+    ],
     [void],
     "nonpayable"
   >;
@@ -402,9 +406,11 @@ export interface FHE_BLOG extends BaseContract {
 
   latest_nonce: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
-  mintNft: TypedContractMethod<[], [void], "nonpayable">;
+  mintNft: TypedContractMethod<[], [void], "payable">;
 
   name: TypedContractMethod<[], [string], "view">;
+
+  owner: TypedContractMethod<[], [string], "view">;
 
   ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
 
@@ -453,6 +459,7 @@ export interface FHE_BLOG extends BaseContract {
 
   verifySignature: TypedContractMethod<
     [
+      nft: BigNumberish,
       relayer_id: BigNumberish,
       nonce: BigNumberish,
       signer: AddressLike,
@@ -483,6 +490,7 @@ export interface FHE_BLOG extends BaseContract {
     nameOrSignature: "claimReward"
   ): TypedContractMethod<
     [
+      nft: BigNumberish,
       relayer_id: BigNumberish,
       caller: AddressLike,
       _nonce: BigNumberish,
@@ -519,7 +527,12 @@ export interface FHE_BLOG extends BaseContract {
   getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<
-    [_data: BlogStorageStruct, _nft_name: string, _nft_short_name: string],
+    [
+      _data: BlogStorageStruct,
+      _p: [BytesLike, BytesLike][],
+      _nft_name: string,
+      _nft_short_name: string
+    ],
     [void],
     "nonpayable"
   >;
@@ -535,9 +548,12 @@ export interface FHE_BLOG extends BaseContract {
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "mintNft"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+  ): TypedContractMethod<[], [void], "payable">;
   getFunction(
     nameOrSignature: "name"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "ownerOf"
@@ -594,6 +610,7 @@ export interface FHE_BLOG extends BaseContract {
     nameOrSignature: "verifySignature"
   ): TypedContractMethod<
     [
+      nft: BigNumberish,
       relayer_id: BigNumberish,
       nonce: BigNumberish,
       signer: AddressLike,
