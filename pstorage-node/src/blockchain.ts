@@ -6,7 +6,7 @@ import { FHE_BLOG__factory } from './types/factories/FHE_BLOG__factory.js';
 import { FHE_BLOGCrutch__factory } from './types/factories/FHE_BLOGCrutch__factory.js';
 import { parseKey } from './crypto.js';
 import bs58 from 'bs58'
-const factoryAddress = '0x294bf3D0323E38A04210C75Eb2D7Eaf7c92C7862';
+const factoryAddress = '0xB195B2D00f8B6DD5EA2DbB667d24Af74ceA53127';
 
 class BlockchainParams {
   signer: ethers.Signer;
@@ -170,7 +170,7 @@ export async function getKeyAndCidFromBlockchain(
   console.log("direct transform ", bytesToBigInt(p[0]), " k2 is ", bytesToBigInt(p[1]));
 
 
-  return;
+  // return; 
   const k1: bigint = await params.fhevmInstance.decrypt(blogAddress, p[0]);
   const k2: bigint = await params.fhevmInstance.decrypt(blogAddress, p[1]);
 
