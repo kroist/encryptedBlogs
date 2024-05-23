@@ -44,6 +44,9 @@ export type BlogStorageStructOutput = [
 export interface FHE_BLOGCrutchInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "DATA_TYPEHASH"
+      | "DOMAIN_SEPARATOR"
+      | "DOMAIN_TYPEHASH"
       | "TOKEN_URI"
       | "approve"
       | "balanceOf"
@@ -52,12 +55,11 @@ export interface FHE_BLOGCrutchInterface extends Interface {
       | "getApproved"
       | "getCid"
       | "getTokenCounter"
-      | "increaseNonce"
       | "initialize"
       | "isApprovedForAll"
-      | "latest_nonce"
       | "mintNft"
       | "name"
+      | "owner"
       | "ownerOf"
       | "reward"
       | "s_tokenCounter"
@@ -79,6 +81,18 @@ export interface FHE_BLOGCrutchInterface extends Interface {
       | "Transfer"
   ): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "DATA_TYPEHASH",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "DOMAIN_SEPARATOR",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "DOMAIN_TYPEHASH",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "TOKEN_URI", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "approve",
@@ -90,7 +104,7 @@ export interface FHE_BLOGCrutchInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "claimReward",
-    values: [BigNumberish, AddressLike, BigNumberish, BytesLike]
+    values: [BigNumberish, BigNumberish, AddressLike, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "generateJwt",
@@ -109,10 +123,6 @@ export interface FHE_BLOGCrutchInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "increaseNonce",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "initialize",
     values: [BlogStorageStruct, string, string]
   ): string;
@@ -120,12 +130,9 @@ export interface FHE_BLOGCrutchInterface extends Interface {
     functionFragment: "isApprovedForAll",
     values: [AddressLike, AddressLike]
   ): string;
-  encodeFunctionData(
-    functionFragment: "latest_nonce",
-    values: [AddressLike]
-  ): string;
   encodeFunctionData(functionFragment: "mintNft", values?: undefined): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
     values: [BigNumberish]
@@ -162,9 +169,21 @@ export interface FHE_BLOGCrutchInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "verifySignature",
-    values: [BigNumberish, BigNumberish, AddressLike, BytesLike]
+    values: [BigNumberish, BigNumberish, BigNumberish, AddressLike, BytesLike]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "DATA_TYPEHASH",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "DOMAIN_SEPARATOR",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "DOMAIN_TYPEHASH",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "TOKEN_URI", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -185,21 +204,14 @@ export interface FHE_BLOGCrutchInterface extends Interface {
     functionFragment: "getTokenCounter",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "increaseNonce",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "latest_nonce",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "mintNft", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "reward", data: BytesLike): Result;
   decodeFunctionResult(
@@ -347,6 +359,12 @@ export interface FHE_BLOGCrutch extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  DATA_TYPEHASH: TypedContractMethod<[], [string], "view">;
+
+  DOMAIN_SEPARATOR: TypedContractMethod<[], [string], "view">;
+
+  DOMAIN_TYPEHASH: TypedContractMethod<[], [string], "view">;
+
   TOKEN_URI: TypedContractMethod<[], [string], "view">;
 
   approve: TypedContractMethod<
@@ -359,6 +377,7 @@ export interface FHE_BLOGCrutch extends BaseContract {
 
   claimReward: TypedContractMethod<
     [
+      nft: BigNumberish,
       relayer_id: BigNumberish,
       caller: AddressLike,
       _nonce: BigNumberish,
@@ -386,8 +405,6 @@ export interface FHE_BLOGCrutch extends BaseContract {
 
   getTokenCounter: TypedContractMethod<[], [bigint], "view">;
 
-  increaseNonce: TypedContractMethod<[], [void], "nonpayable">;
-
   initialize: TypedContractMethod<
     [_data: BlogStorageStruct, _nft_name: string, _nft_short_name: string],
     [void],
@@ -400,11 +417,11 @@ export interface FHE_BLOGCrutch extends BaseContract {
     "view"
   >;
 
-  latest_nonce: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
-
-  mintNft: TypedContractMethod<[], [void], "nonpayable">;
+  mintNft: TypedContractMethod<[], [void], "payable">;
 
   name: TypedContractMethod<[], [string], "view">;
+
+  owner: TypedContractMethod<[], [string], "view">;
 
   ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
 
@@ -453,6 +470,7 @@ export interface FHE_BLOGCrutch extends BaseContract {
 
   verifySignature: TypedContractMethod<
     [
+      nft: BigNumberish,
       relayer_id: BigNumberish,
       nonce: BigNumberish,
       signer: AddressLike,
@@ -466,6 +484,15 @@ export interface FHE_BLOGCrutch extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
+  getFunction(
+    nameOrSignature: "DATA_TYPEHASH"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "DOMAIN_SEPARATOR"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "DOMAIN_TYPEHASH"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "TOKEN_URI"
   ): TypedContractMethod<[], [string], "view">;
@@ -483,6 +510,7 @@ export interface FHE_BLOGCrutch extends BaseContract {
     nameOrSignature: "claimReward"
   ): TypedContractMethod<
     [
+      nft: BigNumberish,
       relayer_id: BigNumberish,
       caller: AddressLike,
       _nonce: BigNumberish,
@@ -514,9 +542,6 @@ export interface FHE_BLOGCrutch extends BaseContract {
     nameOrSignature: "getTokenCounter"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "increaseNonce"
-  ): TypedContractMethod<[], [void], "nonpayable">;
-  getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<
     [_data: BlogStorageStruct, _nft_name: string, _nft_short_name: string],
@@ -531,13 +556,13 @@ export interface FHE_BLOGCrutch extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "latest_nonce"
-  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
-  getFunction(
     nameOrSignature: "mintNft"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+  ): TypedContractMethod<[], [void], "payable">;
   getFunction(
     nameOrSignature: "name"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "ownerOf"
@@ -594,6 +619,7 @@ export interface FHE_BLOGCrutch extends BaseContract {
     nameOrSignature: "verifySignature"
   ): TypedContractMethod<
     [
+      nft: BigNumberish,
       relayer_id: BigNumberish,
       nonce: BigNumberish,
       signer: AddressLike,

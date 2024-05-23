@@ -99,7 +99,7 @@ const relayers = [process.env.REACT_APP_RELAYER_1, process.env.REACT_APP_RELAYER
 // const relayers = ["http://localhost:3002"]
 
 
-const factoryAddress = '0xB195B2D00f8B6DD5EA2DbB667d24Af74ceA53127';
+const factoryAddress = '0xdECe347ec63049E5242F2bACDd14801310CFB008';
 
 // const factoryAddress = '0x0586D21F55C3d4343baa8Da5a7028A9598251687';
 // const factoryAddress = '0xfB08EaD86e96682EB8782029465d1ce167443E69';
@@ -230,6 +230,7 @@ export const sendText = async(text, instance, metamask_provider)=>{
         }
 
         // console.log("PUB KEYS ARE" , " ", pubkeys);
+        console.log(transformed_keys);
         console.log( " PREDICT " , predict_addr);
         console.log(" CIDs ", cids);
         console.log(" Ps ", keys);
@@ -253,6 +254,7 @@ export const sendText = async(text, instance, metamask_provider)=>{
         
         console.log("deployed");
         console.log()
+
         return blog_address;
        
     }catch(error){
@@ -262,7 +264,7 @@ export const sendText = async(text, instance, metamask_provider)=>{
 }
 
 
-const factoryAddressCrutch = "0x3a71873c01853b6a3189E03c092f698303b73967";
+const factoryAddressCrutch = "0xeBC4e069eef226193338D2D7385C44cFF010D8b4";
   
 
 function toUint64(n) {
