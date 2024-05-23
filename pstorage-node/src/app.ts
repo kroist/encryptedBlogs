@@ -6,7 +6,7 @@ import { extract } from 'it-tar'
 import map from 'it-map'
 import all from 'it-all';
 import { decryptWithKey, parseKey } from './crypto.js';
-import { getKeyAndCidFromBlockchainCrutch, getKeyAndCidFromBlockchain, initBlockchain, generatePublicKey } from './blockchain.js';
+import { getKeyAndCidFromBlockchainCrutch, getKeyAndCidFromBlockchain, initBlockchain, generatePublicKey, createFhevmInstance } from './blockchain.js';
 import cors from 'cors'
 
 let cid = CID.parse('QmSnuWmxptJZdLJpKRarxBMS2Ju2oANVrgbr2xWbie9b2D');
@@ -119,12 +119,17 @@ app.post('/store', async (req: Request, res: Response) => {
 app.get('/pubkey', async (req: Request, res: Response) => {
   let contract : string = String(req.query.contract);
 
-  await generatePublicKey(contract, blockchainParams.signer, blockchainParams.fhevmInstance);
+  console.log(contract);
+
+  const fhevmInstance = await createFhevmInstance(contract, blockchainParams.signer, blockchainParams.provider);
+
+  await generatePublicKey(contract, blockchainParams.signer, fhevmInstance);
   // console.log(" contract is " , contract);
   // console.log(" instance " ,blockchainParams.fhevmInstance);
-  console.log(" pub key " , blockchainParams.fhevmInstance.getPublicKey(contract).publicKey)
+  
+  console.log(" pub key " , fhevmInstance.getPublicKey(contract).publicKey)
   res.send({
-    pubkey: Array.from(blockchainParams.fhevmInstance.getPublicKey(
+    pubkey: Array.from(fhevmInstance.getPublicKey(
       contract
     ).publicKey)
   });
