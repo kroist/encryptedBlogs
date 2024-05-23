@@ -229,8 +229,6 @@ export const sendText = async(text, instance, metamask_provider)=>{
             transformed_keys.push(new Uint8Array(pubkeys[i]));
         }
 
-        // console.log("PUB KEYS ARE" , " ", pubkeys);
-        console.log(transformed_keys);
         console.log( " PREDICT " , predict_addr);
         console.log(" CIDs ", cids);
         console.log(" Ps ", keys);
@@ -264,7 +262,7 @@ export const sendText = async(text, instance, metamask_provider)=>{
 }
 
 
-const factoryAddressCrutch = "0xeBC4e069eef226193338D2D7385C44cFF010D8b4";
+const factoryAddressCrutch = "0x7D26816541A2e3c20E67F2d224a9d490eb61b12D";
   
 
 function toUint64(n) {
@@ -331,6 +329,10 @@ export const sendTextCrutch = async(text, instance, metamask_provider)=>{
           );
       }
       
+
+      const addresses = await new_client.getAddresses();
+
+      console.log("addresses", addresses);
       console.log( " PREDICT " , predict_addr);
       console.log(" CIDs ", cids);
       console.log(" Ps ", keys);
@@ -358,12 +360,13 @@ export const sendTextCrutch = async(text, instance, metamask_provider)=>{
 
       console.log(" ENCRYPED KEYS ARE " , keys);
 
-      const txDeploy = await fheBlogFactory["createBlog((bytes[],uint64[2][],bytes32[]),string,string,bytes32)"](
+      const txDeploy = await fheBlogFactory["createBlog((bytes[],uint64[2][],bytes32[]),address[],string,string,bytes32)"](
         {
             cid: bytes32_cids,
             p: keys,
             publicKey: transformed_keys
         },  
+        addresses,
         'FHE_BLOG',
         'FHBL',
         randomSalt,

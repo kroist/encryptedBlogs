@@ -9,6 +9,7 @@ import type {
   Result,
   Interface,
   EventFragment,
+  AddressLike,
   ContractRunner,
   ContractMethod,
   Listener,
@@ -39,8 +40,8 @@ export interface FHEBlogFactoryCrutchInterface extends Interface {
     nameOrSignature:
       | "blogs"
       | "blogsCount"
-      | "createBlog((bytes[],uint64[2][],bytes32[]),bytes32)"
-      | "createBlog((bytes[],uint64[2][],bytes32[]),string,string,bytes32)"
+      | "createBlog((bytes[],uint64[2][],bytes32[]),address[],string,string,bytes32)"
+      | "createBlog((bytes[],uint64[2][],bytes32[]),address[],bytes32)"
       | "creator"
       | "eip712Domain"
       | "getBlogAddress"
@@ -54,12 +55,12 @@ export interface FHEBlogFactoryCrutchInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "createBlog((bytes[],uint64[2][],bytes32[]),bytes32)",
-    values: [BlogStorageStruct, BytesLike]
+    functionFragment: "createBlog((bytes[],uint64[2][],bytes32[]),address[],string,string,bytes32)",
+    values: [BlogStorageStruct, AddressLike[], string, string, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "createBlog((bytes[],uint64[2][],bytes32[]),string,string,bytes32)",
-    values: [BlogStorageStruct, string, string, BytesLike]
+    functionFragment: "createBlog((bytes[],uint64[2][],bytes32[]),address[],bytes32)",
+    values: [BlogStorageStruct, AddressLike[], BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "creator", values?: undefined): string;
   encodeFunctionData(
@@ -74,11 +75,11 @@ export interface FHEBlogFactoryCrutchInterface extends Interface {
   decodeFunctionResult(functionFragment: "blogs", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "blogsCount", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "createBlog((bytes[],uint64[2][],bytes32[]),bytes32)",
+    functionFragment: "createBlog((bytes[],uint64[2][],bytes32[]),address[],string,string,bytes32)",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "createBlog((bytes[],uint64[2][],bytes32[]),string,string,bytes32)",
+    functionFragment: "createBlog((bytes[],uint64[2][],bytes32[]),address[],bytes32)",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "creator", data: BytesLike): Result;
@@ -149,17 +150,22 @@ export interface FHEBlogFactoryCrutch extends BaseContract {
 
   blogsCount: TypedContractMethod<[], [bigint], "view">;
 
-  "createBlog((bytes[],uint64[2][],bytes32[]),bytes32)": TypedContractMethod<
-    [_data: BlogStorageStruct, salt: BytesLike],
+  "createBlog((bytes[],uint64[2][],bytes32[]),address[],string,string,bytes32)": TypedContractMethod<
+    [
+      _data: BlogStorageStruct,
+      _relayer_addresses: AddressLike[],
+      _nft_name: string,
+      _nft_short_name: string,
+      salt: BytesLike
+    ],
     [void],
     "nonpayable"
   >;
 
-  "createBlog((bytes[],uint64[2][],bytes32[]),string,string,bytes32)": TypedContractMethod<
+  "createBlog((bytes[],uint64[2][],bytes32[]),address[],bytes32)": TypedContractMethod<
     [
       _data: BlogStorageStruct,
-      _nft_name: string,
-      _nft_short_name: string,
+      _relayer_addresses: AddressLike[],
       salt: BytesLike
     ],
     [void],
@@ -197,19 +203,24 @@ export interface FHEBlogFactoryCrutch extends BaseContract {
     nameOrSignature: "blogsCount"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "createBlog((bytes[],uint64[2][],bytes32[]),bytes32)"
+    nameOrSignature: "createBlog((bytes[],uint64[2][],bytes32[]),address[],string,string,bytes32)"
   ): TypedContractMethod<
-    [_data: BlogStorageStruct, salt: BytesLike],
+    [
+      _data: BlogStorageStruct,
+      _relayer_addresses: AddressLike[],
+      _nft_name: string,
+      _nft_short_name: string,
+      salt: BytesLike
+    ],
     [void],
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "createBlog((bytes[],uint64[2][],bytes32[]),string,string,bytes32)"
+    nameOrSignature: "createBlog((bytes[],uint64[2][],bytes32[]),address[],bytes32)"
   ): TypedContractMethod<
     [
       _data: BlogStorageStruct,
-      _nft_name: string,
-      _nft_short_name: string,
+      _relayer_addresses: AddressLike[],
       salt: BytesLike
     ],
     [void],
