@@ -11,6 +11,7 @@ import {addNft} from '../hooks/storage.tsx'
 import {mintNft} from '../hooks/useLogin.tsx'
 import ThemeContext from '../ThemeContext.tsx';
 import LoadContent from './LoadContent.tsx'
+import NftInput from './NftInput.tsx'
 function BlogCheckout() {
     const [loading, setLoading] = useState(true);
     const [loadingCaption, setLoadingCaption] = useState("Loading blog info...");
@@ -33,11 +34,28 @@ function BlogCheckout() {
         if(!provider || !firstTime || firstTime.current == true){
             return;
         }
+
+        
+
+
         firstTime.current = true;
         // Extract the path segment after '/blog/'
         const pathParts = location.pathname.split('/'); // This splits the path by '/'
         // Assuming the structure is /blog/:id, `id` should be at index 2
         blogAddress.current = pathParts[2];
+        
+        getBlogPreview(blogAddress.current).then(response=>{
+
+            console.log(" THE RESPONSE IS " , response);
+            setBlog(response);
+            setLoading(false);
+          
+        }).catch(error=> {
+            console.log("couldn't fetch blog info");
+            setError("Couldn't fetch blog info, error occured");
+            setLoading(false);
+        })
+        
         console.log(" Addr is " , blogAddress.current)
         if(blogAddress.current == 'undefined'){
             setError("Blog address not found");
@@ -50,18 +68,8 @@ function BlogCheckout() {
         setLoadingCaption("Checking access...");
         const current_nft = getNftByContract(blogAddress.current);
         if(current_nft.length == 0){
-            getBlogPreview(blogAddress.current).then(response=>{
-
-                console.log(" THE RESPONSE IS " , response);
-                setBlog(response);
-                setHaveAccess(false);
-                setLoading(false);
-              
-            }).catch(error=> {
-                console.log("couldn't fetch blog info");
-                setError("Couldn't fetch blog info, error occured");
-                setLoading(false);
-            })
+            setHaveAccess(false);
+            
              return;
         }
         nftPosession(provider, blogAddress.current, current_nft[0].nft).then(response=>{
@@ -110,14 +118,24 @@ function BlogCheckout() {
                      theme.setShadowLoading(false);
                      setHaveAccess(true);
                }).catch(error => {
+                alert("error occured");
                 setError("Couldn't mint NFT, error occured");
+                console.log("the error is " , error)
                 theme.setShadowLoading(false);
                 setHaveAccess(false);
                })
             }}>
                 Buy blog's NFT
             </button>
-        
+            
+
+
+        <div className="flex items-center flex-col mt-[10%]" >
+            <p className="italic"> Or if you do have an nft, please type your NFT id in here:</p>
+            <NftInput className="mt-5" />
+        </div>
+            
+
         </div>
 
         </div>
@@ -132,16 +150,29 @@ function BlogCheckout() {
         </div>
         }
 
-{loading == false && error != '' && (
-    <div className="w-full mt-5 flex flex-col justify-center items-center font-semibold text-center">
+{loading == false && error == "Couldn't verify your ownership, error occured" && (
+    <div className="w-full mt-10 flex flex-col justify-center items-center font-semibold text-center">
         <div>
-            Error occurred! {error}
-        
-        
+            You seem to not possess the NFT for this blogpost, please change/buy your NFT to get access.
         </div>
-        <button className="mt-5 bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline">
-            Try again
-        </button>
+        
+        <div>
+           
+            <button className="ml-5 mt-5 bg-black text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline" onClick={(e)=>{
+                setError("");
+            }}>
+                Change NFT
+            </button>
+
+
+           
+            
+        </div>
+
+        {/* <div className="flex items-center flex-col mt-[10%]" >
+            <p className="italic"> If this doesn't work, please type your NFT id in here:</p>
+            <NftInput className="mt-5" />
+        </div> */}
     </div>
 )}
 

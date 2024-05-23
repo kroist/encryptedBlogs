@@ -98,7 +98,12 @@ const relayers = [process.env.REACT_APP_RELAYER_1, process.env.REACT_APP_RELAYER
 
 // const relayers = ["http://localhost:3002"]
 
-const factoryAddress = '0xfB08EaD86e96682EB8782029465d1ce167443E69';
+
+const factoryAddress = '0xB195B2D00f8B6DD5EA2DbB667d24Af74ceA53127';
+
+// const factoryAddress = '0x0586D21F55C3d4343baa8Da5a7028A9598251687';
+// const factoryAddress = '0xfB08EaD86e96682EB8782029465d1ce167443E69';
+// const factoryAddress = '0x586Fa517ac6667A36199CA752bC5EF2dAA0c1988'
 // const factoryAddress = '0x4Fa39D4AfaB4d1ed2179Fe9637EEF5aAE2598D93';
 const generatePublicKey = async (contractAddress: string, signer: ethers.Signer, instance: FhevmInstance) => {
     // Generate token to decrypt
@@ -183,6 +188,8 @@ export const sendText = async(text, instance, metamask_provider)=>{
     let keys: [ethers.BytesLike, ethers.BytesLike][] = [];
     for(let i = 0; i < cnt_relayers; i += 1){
         let serialized_key = await serializeKey(not_serialized_keys[i]);
+
+        console.log(" SERIALIZED KEY " , serialized_key);
         keys.push([
             await instance.encrypt64(serialized_key[0]),
             await instance.encrypt64(serialized_key[1])
@@ -450,18 +457,26 @@ export const nftPosession = async (metamask_provider, blog_address, nft)=>{
         blog_address,
         signer
     );
+    try{
+      const owner = await fheBlog.ownerOf(nft)
+      const is_owner = owner == (await signer.getAddress());
 
-    const owner = await fheBlog.ownerOf(nft)
-    const is_owner = owner == (await signer.getAddress());
-
-    console.log(`NFT number ${nft}, owner is ${owner}, you're ${is_owner ? 'the owner' : 'not the owner'}`);
-    return is_owner;
+      console.log(`NFT number ${nft}, owner is ${owner}, you're ${is_owner ? 'the owner' : 'not the owner'}`);
+      return is_owner;
+    }catch(error){
+      console.log("error after getting owner of the nft, prolly because the nft never issued " , error);
+      return false;
+    }
+    
 }
 
 export const mintNft = async(metamask_provider, blog_address)=>{
 
     let provider = normalizeProvider(metamask_provider);
     let signer = await provider.getSigner();
+
+
+    console.log("RELAYERS ARE ", relayers);
     const new_client = new PnodeClient(relayers);
     console.log(" FHE BLOG " , blog_address);
     const fheBlog = FHE_BLOG__factory.connect(
@@ -470,9 +485,14 @@ export const mintNft = async(metamask_provider, blog_address)=>{
     );
 
     const nft = await fheBlog.s_tokenCounter();
-    await fheBlog.mintNft({value: ethers.parseEther("0.01")});
 
+    const tx = await fheBlog["mintNft()"](
+    {value: ethers.parseEther("0.01"), gasLimit: 1000000}
+    );
+
+    await tx.wait();
     return nft;
+  
 }
 
 

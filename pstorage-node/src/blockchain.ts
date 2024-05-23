@@ -112,6 +112,20 @@ export async function getKeyAndCidFromBlockchainCrutch(
     key: await parseKey(k1, k2)
   }
 }
+
+function bytesToBigInt(hexString) {
+  // Remove '0x' prefix if present
+  hexString = hexString.startsWith('0x') ? hexString.slice(2) : hexString;
+
+  // Convert hex string to buffer
+  const buffer = Buffer.from(hexString, 'hex');
+
+  // Convert buffer to BigInt
+  const bigIntValue = BigInt('0x' + buffer.toString('hex'));
+
+  return bigIntValue;
+}
+
 export async function getKeyAndCidFromBlockchain(
   params: BlockchainParams,
   blogAddress: string,
@@ -122,10 +136,10 @@ export async function getKeyAndCidFromBlockchain(
   signature: Uint8Array
 ) {
 
-  const fheBlogFactory = FHEBlogFactory__factory.connect(
-    factoryAddress,
-    params.provider
-  );
+  // const fheBlogFactory = FHEBlogFactory__factory.connect(
+  //   factoryAddress,
+  //   params.provider
+  // );
   // const blogCount = await fheBlogFactory.blogsCount();
   
   // if (blog_id >= blogCount) {
@@ -148,12 +162,25 @@ export async function getKeyAndCidFromBlockchain(
   );
 
   const cid = await blog.getCid(relayer_id);
+  let normal_cid = encodeToIpfsHash(cid);
+  
 
-  const k1: bigint = await params.fhevmInstance.decrypt(factoryAddress, p[0]);
-  const k2: bigint = await params.fhevmInstance.decrypt(factoryAddress, p[1]);
+  console.log("P are ", p);
+
+  console.log("direct transform ", bytesToBigInt(p[0]), " k2 is ", bytesToBigInt(p[1]));
+
+
+  return;
+  const k1: bigint = await params.fhevmInstance.decrypt(blogAddress, p[0]);
+  const k2: bigint = await params.fhevmInstance.decrypt(blogAddress, p[1]);
+
+
+
+  console.log("k1 is ", k1, " k2 is ", k2);
+
 
   return {
-    cid,
+    cid : normal_cid,
     key: await parseKey(k1, k2)
   }
 

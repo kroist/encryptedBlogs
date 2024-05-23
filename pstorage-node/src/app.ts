@@ -77,7 +77,7 @@ app.post('/retrieve_decrypt', async (req: Request, res: Response) => {
 
   console.log("data is " , data);
 
-  const {cid, key} = await getKeyAndCidFromBlockchainCrutch(
+  const {cid, key} = await getKeyAndCidFromBlockchain(
     blockchainParams,
     data.blog_addr,
     data.nft_id,

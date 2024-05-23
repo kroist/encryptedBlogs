@@ -203,11 +203,15 @@ const EditBlogPost = (props) => {
           const res = await response.encrypt64(375813857);
           
           fhevmInstance.current = response;
+
+          alert('successfully')
         }catch(error){
           console.log("error while setting fhevm up" , error)
+          alert('couldnt set up fhevm')
         }
       }else{
         setError("Please connect to metamask first");
+        alert('connect to metamask please ')
       }
     }
   }
