@@ -1,0 +1,12 @@
+
+> pstorage-node@1.0.0 start /Users/zubec/Code/encryptedBlogs/pstorage-node
+> pnpm build && node ./dist/app.js "3002" "0xc23908a9ed6192064abfbadb460e33d6171b1380c931972c2971575b13961ed7"
+
+
+> pstorage-node@1.0.0 build /Users/zubec/Code/encryptedBlogs/pstorage-node
+> tsc
+
+CID(QmSnuWmxptJZdLJpKRarxBMS2Ju2oANVrgbr2xWbie9b2D)
+CID(bafybeiccfclkdtucu6y4yc5cpr6y3yuinr67svmii46v5cfcrkp47ihehy)
+read
+Server running on http://localhost:3002

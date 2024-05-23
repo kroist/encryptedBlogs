@@ -77,7 +77,7 @@ app.post('/retrieve_decrypt', async (req: Request, res: Response) => {
 
   console.log("data is " , data);
 
-  const {cid, key} = await getKeyAndCidFromBlockchain(
+  const {cid, key} = await getKeyAndCidFromBlockchainCrutch(
     blockchainParams,
     data.blog_addr,
     data.nft_id,
@@ -134,6 +134,13 @@ app.get('/pubkey', async (req: Request, res: Response) => {
     ).publicKey)
   });
 });
+
+app.get('/address', async (req: Request, res: Response) => {
+  const address = await blockchainParams.signer.getAddress();
+  res.send({
+    address
+  });
+})
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

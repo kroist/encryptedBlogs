@@ -56,6 +56,11 @@ export class Pnode {
     console.log(" RESPONSE IS " , response.data.pubkey);
     return response.data.pubkey;
   }
+  
+  public async getAddress(): Promise<string> {
+    let response = await this.client.get('/address');
+    return response.data.address;
+  }
 }
 
 export class PnodeClient {
@@ -125,5 +130,13 @@ export class PnodeClient {
     
     // let response = await this.client.get('/pubkey');
     return pubkeys;
+  }
+  
+  public async getAddresses(): Promise<string[]> {
+    let addresses: string[] = [];
+    for (let i = 0; i < this.nodes.length; i++) {
+      addresses.push(await this.nodes[i].getAddress());
+    }
+    return addresses;
   }
 }
