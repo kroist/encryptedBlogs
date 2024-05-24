@@ -38,6 +38,7 @@ function LoadContent({provider, blogAddress}) {
 
             setContent(in_char);
             setReady(true);
+            setLoading(false);
         }catch(error){
             setLoading(false);
             setReady(true);

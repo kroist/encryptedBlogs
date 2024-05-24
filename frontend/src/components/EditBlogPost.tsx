@@ -343,7 +343,7 @@ const EditBlogPost = (props) => {
 
       
 
-        <Loading loading={loading} />
+        {/* <Loading loading={loading} /> */}
       </div>
 
       </div>
