@@ -25,19 +25,24 @@ function LoadContent({provider, blogAddress}) {
     const firstTime = useRef(false);
     const [caption, setCaption] = useState('You have a blog nft, requesting access...');
 
-
+    const [error, setError] = useState("");
     
     const loadContent = async(blog_addr)=>{
         const saved_nft = getNftByContract(blog_addr)[0].nft;
-        const raw_content = await requestAccess(provider , blog_addr, saved_nft, setCaption);
-        let in_char = fromHexToString(raw_content);
+        try{
+            const raw_content = await requestAccess(provider , blog_addr, saved_nft, setCaption);
+            let in_char = fromHexToString(raw_content);
 
-        let with_images = in_char;
-        console.log(" THE CONTENT IS " , in_char);
+            let with_images = in_char;
+            console.log(" THE CONTENT IS " , in_char);
 
-        setContent(in_char);
-        setReady(true);
-        setLoading(false);
+            setContent(in_char);
+            setReady(true);
+        }catch(error){
+            setLoading(false);
+            setReady(true);
+            setError("Couldn't fetch blog info, error occured");
+        }
     }
     useEffect(()=>{
         if(!firstTime || firstTime.current == true){
@@ -51,13 +56,22 @@ function LoadContent({provider, blogAddress}) {
     return <> 
 
         <Loading loading={loading} caption={caption}/>
-        {ready && 
+        {ready && error == '' &&
         <div  style={{ maxWidth: '820px' , width: '90vw', minHeight: '90vh'}} className="border-l border-r border-gray-300" >
         
             <MDEditor.Markdown source={content} style={{ whiteSpace: 'pre-wrap' }} />
 
         </div>
         }
+        {ready && error != '' &&
+        
+        <div className="flex items-center flex-col mt-[10%]" >
+        <p className="italic"> {error}</p>
+        <button className="bg-black mt-5 text-white font-semibold py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline"
+        onClick={()=>window.location.reload()}
+
+        > Try again </button>
+    </div> }
     </>
 }
 

@@ -206,7 +206,7 @@ const EditBlogPost = (props) => {
 
         }catch(error){
           console.log("error while setting fhevm up" , error)
-          alert('error setting up')
+        
         }
       }else{
         setError("Please connect to metamask first");
@@ -315,7 +315,12 @@ const EditBlogPost = (props) => {
         console.log(" text is " , nwText);
 
         console.log("fhevm instance is " , fhevmInstance.current);
+        
+        if(fhevmInstance.current == null){
+          theme.setShadowLoading(false);
 
+          return;
+        }
 
         blog.current = await sendTextCrutch(nwText, price, fhevmInstance.current, provider);
 

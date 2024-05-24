@@ -271,9 +271,6 @@ function toUint64(n) {
 export const sendTextCrutch = async(text, price, instance, metamask_provider)=>{
     
 
-  const res = await instance.encrypt64(12351);
-
-  console.log("sendText encryption is working " , res);
   let provider = normalizeProvider(metamask_provider);
   let signer = await provider.getSigner();
   console.log("signer is " , await provider.getNetwork())
