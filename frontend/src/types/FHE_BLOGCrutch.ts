@@ -61,6 +61,7 @@ export interface FHE_BLOGCrutchInterface extends Interface {
       | "name"
       | "owner"
       | "ownerOf"
+      | "price"
       | "reward"
       | "s_tokenCounter"
       | "safeTransferFrom(address,address,uint256)"
@@ -124,7 +125,7 @@ export interface FHE_BLOGCrutchInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [BlogStorageStruct, string, string]
+    values: [BlogStorageStruct, AddressLike[], string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -137,6 +138,7 @@ export interface FHE_BLOGCrutchInterface extends Interface {
     functionFragment: "ownerOf",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "price", values?: undefined): string;
   encodeFunctionData(functionFragment: "reward", values: [AddressLike]): string;
   encodeFunctionData(
     functionFragment: "s_tokenCounter",
@@ -213,6 +215,7 @@ export interface FHE_BLOGCrutchInterface extends Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "price", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "reward", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "s_tokenCounter",
@@ -406,7 +409,13 @@ export interface FHE_BLOGCrutch extends BaseContract {
   getTokenCounter: TypedContractMethod<[], [bigint], "view">;
 
   initialize: TypedContractMethod<
-    [_data: BlogStorageStruct, _nft_name: string, _nft_short_name: string],
+    [
+      _data: BlogStorageStruct,
+      _relayer_addresses: AddressLike[],
+      _nft_name: string,
+      _nft_short_name: string,
+      _price: BigNumberish
+    ],
     [void],
     "nonpayable"
   >;
@@ -424,6 +433,8 @@ export interface FHE_BLOGCrutch extends BaseContract {
   owner: TypedContractMethod<[], [string], "view">;
 
   ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+
+  price: TypedContractMethod<[], [bigint], "view">;
 
   reward: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
@@ -544,7 +555,13 @@ export interface FHE_BLOGCrutch extends BaseContract {
   getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<
-    [_data: BlogStorageStruct, _nft_name: string, _nft_short_name: string],
+    [
+      _data: BlogStorageStruct,
+      _relayer_addresses: AddressLike[],
+      _nft_name: string,
+      _nft_short_name: string,
+      _price: BigNumberish
+    ],
     [void],
     "nonpayable"
   >;
@@ -567,6 +584,9 @@ export interface FHE_BLOGCrutch extends BaseContract {
   getFunction(
     nameOrSignature: "ownerOf"
   ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "price"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "reward"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;

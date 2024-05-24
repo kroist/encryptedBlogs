@@ -8,7 +8,7 @@ import BlogPostPreview from './BlogPostPreview.tsx'
 import useCustomSDK from '../hooks/useCustomSDK.tsx'
 import { getBlogPreview } from '../hooks/publicPreview.tsx';
 import {addNft} from '../hooks/storage.tsx'
-import {mintNft} from '../hooks/useLogin.tsx'
+import {mintNft, mintNftCrutch} from '../hooks/useLogin.tsx'
 import ThemeContext from '../ThemeContext.tsx';
 import LoadContent from './LoadContent.tsx'
 import NftInput from './NftInput.tsx'
@@ -17,6 +17,8 @@ function BlogCheckout() {
     const [loadingCaption, setLoadingCaption] = useState("Loading blog info...");
     const [have_access, setHaveAccess] = useState(false);
     const [blog, setBlog] = useState(null);
+
+    
     const location = useLocation();
     const blogAddress = useRef();
 
@@ -88,6 +90,29 @@ function BlogCheckout() {
         // You can now use `blogId` for fetching data, etc.
     }, [location, firstTime, provider]);
 
+
+    const retry = ()=>{
+        setLoading(true);
+        setLoadingCaption("Checking access...");
+        const current_nft = getNftByContract(blogAddress.current);
+        if(current_nft.length == 0){
+            setHaveAccess(false);
+            
+            return;
+        }
+        nftPosession(provider, blogAddress.current, current_nft[0].nft).then(response=>{
+            if(response){
+                setHaveAccess(true);
+            }
+            setLoading(false);
+        }).catch(error => {
+            console.log("error while checking access " , error);
+            setError("Couldn't verify your ownership, error occured");
+            setLoading(false);
+        
+        })
+    }
+
     return <> <div className="flex flex-col items-center w-full">
      
         {
@@ -111,7 +136,7 @@ function BlogCheckout() {
        onClick={(e) => {
 
                theme.setShadowLoading(true);
-               mintNft(provider, blogAddress.current).then(response=>{
+               mintNftCrutch(provider, blogAddress.current).then(response=>{
                      console.log("NFT MINTED " , response);
                      addNft(blogAddress.current, response);
 
@@ -132,7 +157,7 @@ function BlogCheckout() {
 
         <div className="flex items-center flex-col mt-[10%]" >
             <p className="italic"> Or if you do have an nft, please type your NFT id in here:</p>
-            <NftInput className="mt-5" />
+            <NftInput className="mt-5" address={blogAddress.current} retry={retry}/>
         </div>
             
 

@@ -262,13 +262,13 @@ export const sendText = async(text, instance, metamask_provider)=>{
 }
 
 
-const factoryAddressCrutch = "0x7D26816541A2e3c20E67F2d224a9d490eb61b12D";
+const factoryAddressCrutch = "0x088dAac3A90dbDC34E7012db70E21f4f64BeDB6c";
   
 
 function toUint64(n) {
   return BigInt.asUintN(64, n);
 }
-export const sendTextCrutch = async(text, instance, metamask_provider)=>{
+export const sendTextCrutch = async(text, price, instance, metamask_provider)=>{
     
 
   const res = await instance.encrypt64(12351);
@@ -360,7 +360,7 @@ export const sendTextCrutch = async(text, instance, metamask_provider)=>{
 
       console.log(" ENCRYPED KEYS ARE " , keys);
 
-      const txDeploy = await fheBlogFactory["createBlog((bytes[],uint64[2][],bytes32[]),address[],string,string,bytes32)"](
+      const txDeploy = await fheBlogFactory["createBlog((bytes[],uint64[2][],bytes32[]),address[],string,string,bytes32,uint256)"](
         {
             cid: bytes32_cids,
             p: keys,
@@ -370,6 +370,7 @@ export const sendTextCrutch = async(text, instance, metamask_provider)=>{
         'FHE_BLOG',
         'FHBL',
         randomSalt,
+        ethers.parseEther(String(price)),
         {
           gasLimit: 10000000
         }
@@ -492,12 +493,37 @@ export const mintNft = async(metamask_provider, blog_address)=>{
     const nft = await fheBlog.s_tokenCounter();
 
     const tx = await fheBlog["mintNft()"](
-    {value: ethers.parseEther("0.01"), gasLimit: 1000000}
+    {value: ethers.parseEther(String(price)), gasLimit: 1000000}
     );
 
     await tx.wait();
     return nft;
-  
+}
+export const mintNftCrutch = async(metamask_provider, blog_address)=>{
+
+  let provider = normalizeProvider(metamask_provider);
+  let signer = await provider.getSigner();
+
+
+  console.log("RELAYERS ARE ", relayers);
+  const new_client = new PnodeClient(relayers);
+  console.log(" FHE BLOG " , blog_address);
+  const fheBlog = FHE_BLOGCrutch__factory.connect(
+      blog_address,
+      signer
+  );
+  let actual_price = await fheBlog.price();
+  const divisor = BigInt(10) ** BigInt(18);
+const price = actual_price / divisor;
+  // const price = Math.floor(actual_price / 1e18);
+  const nft = await fheBlog.s_tokenCounter();
+
+  const tx = await fheBlog["mintNft()"](
+  {value: ethers.parseEther(String(price)), gasLimit: 1000000}
+  );
+
+  await tx.wait();
+  return nft;
 }
 
 

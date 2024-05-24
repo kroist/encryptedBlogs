@@ -126,7 +126,7 @@ return formattedDate;
 const EditBlogPost = (props) => {
   const [headline, setHeadline] = useState('');
   const [description, setDescription] = useState('');
-
+  const [price, setPrice] = useState(20);
     const [markdownUI, setMarkdownUI] = useState(null)
     const [inputValue, setInputValue] = useState();
     // Function to handle changes in the input field
@@ -204,14 +204,12 @@ const EditBlogPost = (props) => {
           
           fhevmInstance.current = response;
 
-          alert('successfully')
         }catch(error){
           console.log("error while setting fhevm up" , error)
-          alert('couldnt set up fhevm')
+          alert('error setting up')
         }
       }else{
         setError("Please connect to metamask first");
-        alert('connect to metamask please ')
       }
     }
   }
@@ -254,22 +252,18 @@ const EditBlogPost = (props) => {
     };
   }, []);
 
-  const testNftMint = async ()=>{
-      const some = '0x06FEa2766f97B52879b73fcC8E7537f51DDbEE30';
-      const nft_token = await mintNft(provider, some);
-      alert("Issued token is " + nft_token);
-      alert("True if you're owner of it" + await nftPosession(provider, some, nft_token));
-  }
   const [kek, setKek] = useState()
   const theme = useContext(ThemeContext);
   const [loading, setLoading] = useState(false);
+  const [author, setAuthor] = useState('Daniel');
   const submitEdit = ()=>{
     setLoading(true);
 
     const publicPreview = {
       headline: headline,
       description: description,
-      author: 'Daniel',
+      author: author,
+      price: `${price} ZAMA`,
       date: prettyDate(new Date()),
       address: blog.current
     }
@@ -296,7 +290,7 @@ const EditBlogPost = (props) => {
       
       
      
-      <BlogPreviewInput headline={headline} setHeadline={setHeadline} description={description} setDescription={setDescription}/>
+      <BlogPreviewInput author={author} setAuthor = {setAuthor} price={price} setPrice={setPrice} headline={headline} setHeadline={setHeadline} description={description} setDescription={setDescription}/>
 
 
 
@@ -323,7 +317,7 @@ const EditBlogPost = (props) => {
         console.log("fhevm instance is " , fhevmInstance.current);
 
 
-        blog.current = await sendTextCrutch(nwText, fhevmInstance.current, provider);
+        blog.current = await sendTextCrutch(nwText, price, fhevmInstance.current, provider);
 
         await submitEdit();
 

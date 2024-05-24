@@ -35,3 +35,16 @@ export const addNft = (contract , nft)=>{
     });
     localStorage.setItem("nft_possesion" , JSON.stringify(nfts));
 }
+
+export const removeNft = (contract)=>{
+    let nfts = getNfts();
+    let newNfts = [];
+    for(let i = 0 ; i < nfts.length; i++){
+        if(nfts[i].contract == contract){
+            continue;
+        }else{
+            newNfts.push(nfts[i]);
+        }
+    }
+    localStorage.setItem("nft_possesion" , JSON.stringify(newNfts));
+}

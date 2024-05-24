@@ -7,7 +7,7 @@ function BlogPostPreview({blog}) {
             <div className="flex justify-between items-center">
                 <span className="font-light text-gray-600">{blog && blog.date}</span>
                 {
-                    blog?.tag && <a className="px-2 py-1 bg-gray-600 text-gray-100 font-bold rounded hover:bg-gray-500" href="#">{blog && blog.tag}</a>
+                    blog?.price && <a className="px-2 py-1 bg-gray-600 text-gray-100 font-bold rounded hover:bg-gray-500" href="#">{blog && blog.price}</a>
                 }
             </div>
 
